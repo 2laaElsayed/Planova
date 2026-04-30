@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/features/group/presentation/data/models/group_item.dart';
@@ -118,12 +117,12 @@ class _GroupsScreenBodyState extends State<GroupsScreenBody> {
               ),
               const SizedBox(height: 16),
               GroupsSearchRow(onSearch: (v) => setState(() => _query = v)),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               GroupsScopeTabs(
                 selected: _scope,
                 onChange: (s) => setState(() => _scope = s),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               GroupsActivityChips(
                 selected: _activity,
                 onChange: (a) => setState(() => _activity = a),
@@ -145,6 +144,4 @@ class _GroupsScreenBodyState extends State<GroupsScreenBody> {
       ),
     );
   }
-
 }
-

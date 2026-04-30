@@ -6,6 +6,7 @@ import 'package:planova_app/features/group/presentation/views/group_details/grou
 import 'package:planova_app/features/auth/screens/sign_in_screen.dart';
 import 'package:planova_app/features/auth/screens/sign_up_screen.dart';
 import 'package:planova_app/features/auth/screens/reset_password_screen.dart';
+import 'package:planova_app/features/main_page.dart';
 import 'package:provider/provider.dart';
 import 'package:planova_app/features/auth/providers/auth_provider.dart';
 import 'package:planova_app/features/auth/screens/verify_code_screen.dart';
@@ -16,19 +17,19 @@ abstract class AppRouter {
   static const String signIn = '/signIn';
   static const String signUp = '/signUp';
   static const String resetPassword = '/resetPassword';
-  static const String verifyCode = '/verifyCode'; 
-  static const String changePassword = '/changePassword'; 
+  static const String verifyCode = '/verifyCode';
+  static const String changePassword = '/changePassword';
 
-  // Home 
+  // Home
   static const String root = '/';
 
   // Groups
   static const String kCreateGroupView = '/CreateGroupView';
   static const String kGroupDetailsView = '/GroupDetailsView';
   static const String kEditGroupView = '/EditGroupView';
-
+  static const String mainPage = '/MainPage';
   static final router = GoRouter(
-    initialLocation: signIn,
+    initialLocation: mainPage,
 
     redirect: (context, state) {
       final auth = Provider.of<AuthProvider>(context, listen: false);
@@ -39,12 +40,12 @@ abstract class AppRouter {
       final isAuthRoute =
           location == signIn ||
           location == signUp ||
-          location == resetPassword || 
+          location == resetPassword ||
           location == verifyCode ||
           location == changePassword;
 
       if (!isLoggedIn && !isAuthRoute) {
-        return signIn;
+        return mainPage;
       }
 
       if (isLoggedIn && isAuthRoute) {
@@ -56,32 +57,24 @@ abstract class AppRouter {
 
     routes: [
       // Auth
-      GoRoute(
-        path: signIn,
-        builder: (context, state) => const SignInScreen(),
-      ),
-      GoRoute(
-        path: signUp,
-        builder: (context, state) => const SignUpScreen(),
-      ),
+      GoRoute(path: signIn, builder: (context, state) => const SignInScreen()),
+      GoRoute(path: signUp, builder: (context, state) => const SignUpScreen()),
       GoRoute(
         path: resetPassword,
         builder: (context, state) => const ResetPasswordScreen(),
       ),
       GoRoute(
-        path: verifyCode, 
-        builder: (context, state) => const VerifyCodeScreen(), 
+        path: verifyCode,
+        builder: (context, state) => const VerifyCodeScreen(),
       ),
       GoRoute(
-        path: changePassword, 
+        path: changePassword,
         builder: (context, state) => const ChangePasswordScreen(),
       ),
 
-      //Groups 
-      GoRoute(
-        path: root,
-        builder: (context, state) => const GroupsScreen(),
-      ),
+      GoRoute(path: mainPage, builder: (context, state) => const MainPage()),
+      //Groups
+      GoRoute(path: root, builder: (context, state) => const GroupsScreen()),
       GoRoute(
         path: kCreateGroupView,
         builder: (context, state) => const CreateGroupView(),

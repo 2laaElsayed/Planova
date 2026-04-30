@@ -17,30 +17,69 @@ class GroupsScopeTabs extends StatelessWidget {
     Widget item(String label, ScopeTab value) {
       final isSelected = selected == value;
 
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      final textWidth = textPainter.width;
+
       return Expanded(
         child: GestureDetector(
           onTap: () => onChange(value),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? AppColors.kPrimary : Colors.black45,
-                fontWeight:
-                    isSelected ? FontWeight.w700 : FontWeight.w500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppColors.kPrimary : AppColors.blueGrey,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
-            ),
+              const SizedBox(height: 6),
+
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 2,
+                width: isSelected ? textWidth : 0,
+                decoration: BoxDecoration(
+                  color: AppColors.kPrimary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ],
           ),
         ),
       );
     }
 
     return SizedBox(
-      height: 22,
-      child: Row(
+      height: 40,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
-          item('All Groups', ScopeTab.all),
-          item('Team', ScopeTab.team),
-          item('Personal', ScopeTab.personal),
+          const Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Divider(height: 1, thickness: 1, color: AppColors.kStroke),
+          ),
+
+          Row(
+            children: [
+              item('All Groups', ScopeTab.all),
+              item('Team', ScopeTab.team),
+              item('Personal', ScopeTab.personal),
+            ],
+          ),
         ],
       ),
     );

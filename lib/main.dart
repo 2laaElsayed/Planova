@@ -10,16 +10,12 @@ import 'features/auth/providers/auth_provider.dart';
 void main() {
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-      ],
-      child: DevicePreview(
-        enabled: !kReleaseMode,
-        builder: (context) => const MyApp(),
-      ),
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: DevicePreview(enabled: false, builder: (context) => const MyApp()),
     ),
   );
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

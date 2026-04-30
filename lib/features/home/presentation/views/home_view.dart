@@ -10,19 +10,21 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-          child: Column(
-            children: [
-              CustomAppBar(),
-              SizedBox(height: 24),
-              TodayProgressCard(),
-              SizedBox(height: 24),
-              TodaysTasksSection(),
-              SizedBox(height: 24),
-              TaskOverviewSection(),
-            ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                CustomAppBar(),
+                SizedBox(height: 24),
+                TodayProgressCard(),
+                SizedBox(height: 24),
+                TodaysTasksSection(),
+                SizedBox(height: 24),
+                TaskOverviewSection(),
+              ],
+            ),
           ),
         ),
       ),

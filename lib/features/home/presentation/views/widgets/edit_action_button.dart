@@ -16,7 +16,7 @@ class EditActionButton extends StatelessWidget {
         border: Border.all(color: AppColors.grey350),
       ),
       child: SvgPicture.asset(
-        Assets.assetsImagesEdit,
+        Assets.imagesEdit,
         width: 18,
         height: 18,
       ),

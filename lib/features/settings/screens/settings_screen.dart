@@ -16,7 +16,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsOn = true;
   bool _darkModeOn = false;
-  int _selectedIndex = 3;
 
   final List<StatisticCardData> _statistics = const [
     StatisticCardData(
@@ -48,12 +47,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       iconColor: Color(0xFF1E88E5),
     ),
   ];
-
-  void _onBottomNavTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -331,30 +324,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onBottomNavTapped,
-        selectedItemColor: AppColors.primaryColor,
-        unselectedItemColor: const Color(0xFF9E9E9E),
-        backgroundColor: AppColors.cardColor,
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.task_outlined),
-            label: 'Tasks',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group_outlined),
-            label: 'Group',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
-        ],
       ),
     );
   }
