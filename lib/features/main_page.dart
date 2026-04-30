@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planova_app/screens/tasks/view/tasks_list_screen.dart';
 import '../core/widgets/custom_bottom_nav_bar.dart';
 import 'package:planova_app/features/home/presentation/views/home_view.dart';
 import 'package:planova_app/features/home/presentation/views/task_overview_view.dart';
@@ -18,7 +19,7 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> screens = const [
     HomeView(),
-    TaskOverviewView(),
+    TasksScreen(),
     GroupsScreen(),
     SettingsScreen(),
   ];
