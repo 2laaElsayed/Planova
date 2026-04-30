@@ -11,6 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:planova_app/features/auth/providers/auth_provider.dart';
 import 'package:planova_app/features/auth/screens/verify_code_screen.dart';
 import 'package:planova_app/features/auth/screens/change_password_screen.dart';
+import 'package:planova_app/features/tasks/screens/task_screen.dart';
+import 'package:planova_app/features/tasks/screens/tasks_list_screen.dart';
 
 abstract class AppRouter {
   // Auth
@@ -71,7 +73,15 @@ abstract class AppRouter {
         path: changePassword,
         builder: (context, state) => const ChangePasswordScreen(),
       ),
-
+      //tasks screen
+      GoRoute(
+        path: '/tasksScreen',
+        builder: (context, state) => const TasksScreen(),
+      ),
+      GoRoute(
+        path: '/createTaskScreen',
+        builder: (context, state) => const CreateTaskScreen(),
+      ),
       GoRoute(path: mainPage, builder: (context, state) => const MainPage()),
       //Groups
       GoRoute(path: root, builder: (context, state) => const GroupsScreen()),

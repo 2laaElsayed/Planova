@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'widgets/task_details_widgets/task_input_fields.dart';
-import 'widgets/task_details_widgets/task_options_row.dart';
-import 'widgets/task_details_widgets/task_date_picker.dart';
-import 'widgets/task_details_widgets/task_app_bar.dart';
-import 'widgets/task_details_widgets/task_reminder.dart';
-import 'widgets/task_details_widgets/primary_button.dart';
+import '../widgets/task_details_widgets/task_input_fields.dart';
+import '../widgets/task_details_widgets/task_options_row.dart';
+import '../widgets/task_details_widgets/task_date_picker.dart';
+import '../widgets/task_details_widgets/task_app_bar.dart';
+import '../widgets/task_details_widgets/task_reminder.dart';
+import '../widgets/task_details_widgets/primary_button.dart';
 
 class CreateTaskScreen extends StatelessWidget {
   final bool isEdit;

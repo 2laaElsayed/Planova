@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planova_app/screens/tasks/models/task_card_model.dart';
+import 'package:planova_app/features/tasks/models/task_card_model.dart';
 
 class TaskCard extends StatelessWidget {
   final TaskCardModel task;

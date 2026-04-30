@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'widgets/tasks_list_widgets/tasks_app_bar.dart';
-import 'widgets/tasks_list_widgets/date_selector.dart';
-import 'widgets/tasks_list_widgets/filter_tabs.dart';
-import 'widgets/tasks_list_widgets/section_header.dart';
-import 'widgets/tasks_list_widgets/task_card.dart';
-import 'package:planova_app/screens/tasks/models/task_card_model.dart';
-import 'widgets/tasks_list_widgets/bottom_nav_bar.dart';
+import '../widgets/tasks_list_widgets/tasks_app_bar.dart';
+import '../widgets/tasks_list_widgets/date_selector.dart';
+import '../widgets/tasks_list_widgets/filter_tabs.dart';
+import '../widgets/tasks_list_widgets/section_header.dart';
+import '../widgets/tasks_list_widgets/task_card.dart';
+import 'package:planova_app/features/tasks/models/task_card_model.dart';
 import 'task_screen.dart';
 
 class TasksScreen extends StatefulWidget {
@@ -124,11 +123,7 @@ class _TasksScreenState extends State<TasksScreen> {
         ),
       ),
 
-      bottomNavigationBar: CustomBottomNavBar(
-        onItemSelected: (index) {
-          // navigation
-        },
-      ),
+      
     );
   }
 }
