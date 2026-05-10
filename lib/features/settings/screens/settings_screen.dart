@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
-
+import 'package:go_router/go_router.dart';
 import '../models/statisticCardData.dart';
 import '../widgets/statisticCard.dart';
 import 'privacy_security_screen.dart';
+import 'package:provider/provider.dart';
+import '../../auth/providers/auth_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -317,7 +319,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                  context.read<AuthProvider>().logout();    
+                  context.go('/signIn');
+                  },
                 ),
               ),
               const SizedBox(height: 10),

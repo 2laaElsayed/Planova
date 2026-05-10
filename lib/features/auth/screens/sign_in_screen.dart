@@ -20,27 +20,30 @@ class _SignInScreenState extends State<SignInScreen> {
   bool isLoading = false;
 
   void handleLogin() async {
-  if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please enter email & password")),
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter email & password")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    await context.read<AuthProvider>().login(
+      email: emailController.text.trim(),
+      password: passwordController.text,
     );
-    return;
+
+    setState(() => isLoading = false);
+
+    if (!mounted) return;
+
+    context.go('/');
   }
-
-  setState(() => isLoading = true);
-
-  await Future.delayed(const Duration(seconds: 2));
-
-  if (!mounted) return;
-
-  await context.read<AuthProvider>().login();
-
-  setState(() => isLoading = false);
-
-  if (!mounted) return;
-
-  context.go('/');
-}
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +58,10 @@ class _SignInScreenState extends State<SignInScreen> {
               const Text(
                 "Sign In",
                 style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1D264F)),
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1D264F),
+                ),
               ),
               const SizedBox(height: 12),
               const Text(
@@ -110,10 +114,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
               isLoading
                   ? const CircularProgressIndicator()
-                  : AuthButton(
-                      text: "Sign In",
-                      onPressed: handleLogin,
-                    ),
+                  : AuthButton(text: "Sign In", onPressed: handleLogin),
 
               const SizedBox(height: 20),
               _buildOrDivider(),

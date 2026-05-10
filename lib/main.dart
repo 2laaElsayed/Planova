@@ -26,34 +26,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-
+      
       // Device Preview
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
 
-      // Routing
-      routerConfig: AppRouter.router,
+      routerConfig: AppRouter.router(authProvider),
 
       // Theme
       theme: ThemeData(
         useMaterial3: true,
-
-        // Colors
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.kPrimary,
           primary: AppColors.kPrimary,
         ),
         scaffoldBackgroundColor: AppColors.kBackGround,
-
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.kBackGround,
           elevation: 0,
         ),
-
-        // Fonts (أفضل من fontFamily العادي)
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
     );
