@@ -66,7 +66,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Overlay.of(context),
           CustomSnackBar.error(message: errorMessage),
         );
-        ;
       }
     }
   }

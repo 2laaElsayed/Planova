@@ -6,45 +6,43 @@ class DetailsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade100,
-              blurRadius: 10,
-              spreadRadius: 5,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade100,
+            blurRadius: 10,
+            spreadRadius: 5,
+          ),
+        ],
+      ),
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Title",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1D2366),
             ),
-          ],
-        ),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Title",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1D2366),
-              ),
+          ),
+          SizedBox(height: 8),
+          CustomTextField(hintText: "What needs to be done?"),
+          SizedBox(height: 20),
+          Text(
+            "Description",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1D2366),
             ),
-            SizedBox(height: 8),
-            CustomTextField(hintText: "What needs to be done?"),
-            SizedBox(height: 20),
-            Text(
-              "Description",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1D2366),
-              ),
-            ),
-            SizedBox(height: 8),
-            CustomTextField(hintText: "Add details...", maxLines: 4),
-          ],
-        ),
+          ),
+          SizedBox(height: 8),
+          CustomTextField(hintText: "Add details...", maxLines: 4),
+        ],
       ),
     );
   }

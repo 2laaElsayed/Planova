@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:planova_app/features/tasks/screens/tasks_list_screen.dart';
 import '../core/widgets/custom_bottom_nav_bar.dart';
 import 'package:planova_app/features/home/presentation/views/home_view.dart';
-import 'package:planova_app/features/home/presentation/views/task_overview_view.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/GroupsScreen.dart';
 import 'package:planova_app/features/settings/screens/settings_screen.dart';
 

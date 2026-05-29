@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_styles.dart';
@@ -13,9 +12,14 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       maxLines: maxLines,
+
       decoration: InputDecoration(
+        prefixIcon: IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.search, color: AppColors.mediumGrey),
+        ),
         hintText: hintText,
-        hintStyle: AppStyles.styleRegular12,
+        hintStyle: AppStyles.styleRegular14,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.kStroke),

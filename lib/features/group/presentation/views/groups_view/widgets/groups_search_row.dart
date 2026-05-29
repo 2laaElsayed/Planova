@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_router.dart';
+import 'package:planova_app/core/widgets/custom_text_field.dart';
 
 class GroupsSearchRow extends StatelessWidget {
   final Function(String) onSearch;
@@ -20,16 +21,7 @@ class GroupsSearchRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFE7E8F1)),
             ),
-            child: TextField(
-              onChanged: onSearch,
-              decoration: const InputDecoration(
-                hintText: 'Search groups...',
-                hintStyle: TextStyle(color: Colors.black38),
-                border: InputBorder.none,
-                prefixIcon: Icon(Icons.search_rounded, color: Colors.black38),
-                contentPadding: EdgeInsets.only(top: 10),
-              ),
-            ),
+            child: CustomTextField(hintText: "Search groups..."),
           ),
         ),
         const SizedBox(width: 8),
@@ -48,7 +40,11 @@ class GroupsSearchRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Icon(Icons.add_rounded),
+            child: const Icon(
+              Icons.add_rounded,
+              color: AppColors.grey100,
+              size: 32,
+            ),
           ),
         ),
       ],

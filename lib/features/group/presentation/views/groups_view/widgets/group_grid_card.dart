@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
-import 'package:planova_app/features/group/presentation/data/models/group_item.dart';
+import 'package:planova_app/features/group/data/models/group_item.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/avatar_square.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/members_stack.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/scope_badge.dart';

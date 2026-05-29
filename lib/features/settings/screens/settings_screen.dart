@@ -199,7 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           size: 20,
                         ),
                       ),
-                      activeColor: AppColors.primaryLightPurple,
+                      activeThumbColor: AppColors.primaryLightPurple,
                       value: _notificationsOn,
                       onChanged: (value) {
                         setState(() {
@@ -241,7 +241,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           size: 20,
                         ),
                       ),
-                      activeColor: AppColors.primaryColor,
+                      activeThumbColor: AppColors.primaryColor,
                       value: _darkModeOn,
                       onChanged: (value) {
                         setState(() {
