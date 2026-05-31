@@ -1,10 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
+import 'package:planova_app/features/group/data/models/group_model.dart';
+import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 
 class GroupTopInfo extends StatelessWidget {
-  const GroupTopInfo({super.key});
-
+  const GroupTopInfo({super.key, required this.groupEntity});
+  final GroupEntity groupEntity;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,11 +23,11 @@ class GroupTopInfo extends StatelessWidget {
             height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppColors.kLightBlue,
+              color: groupEntity.accentColor,
               borderRadius: BorderRadius.circular(9),
             ),
-            child: const Text(
-              'M',
+            child: Text(
+              groupEntity.name[0],
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -34,12 +35,12 @@ class GroupTopInfo extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Molecular Biology',
+                  groupEntity.name,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -52,7 +53,7 @@ class GroupTopInfo extends StatelessWidget {
                     Icon(Icons.circle, size: 7, color: AppColors.kGreen),
                     SizedBox(width: 4),
                     Text(
-                      'ACTIVE',
+                      groupEntity.status.toString(),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -61,7 +62,7 @@ class GroupTopInfo extends StatelessWidget {
                     ),
                     SizedBox(width: 8),
                     Text(
-                      '3 members',
+                      '${groupEntity.memberUids.length} members',
                       style: TextStyle(
                         fontSize: 11,
                         color: AppColors.kColdGrey,
@@ -71,7 +72,7 @@ class GroupTopInfo extends StatelessWidget {
                 ),
                 SizedBox(height: 6),
                 Text(
-                  'Deep dive into molecular biology concepts and lab work coordination.',
+                  groupEntity.description,
                   style: TextStyle(
                     fontSize: 11,
                     color: AppColors.kColdGrey,

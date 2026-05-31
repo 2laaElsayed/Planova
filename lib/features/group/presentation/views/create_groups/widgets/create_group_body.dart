@@ -1,12 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:planova_app/core/widgets/custom_button.dart';
+import 'package:planova_app/features/group/data/models/group_item.dart';
+import 'package:planova_app/features/group/domain/entities/group_entity.dart';
+import 'package:planova_app/features/group/presentation/manager/create_group_cubit/create_group_cubit.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/widgets/appearance_body.dart';
 import 'package:planova_app/features/group/presentation/views/widgets/details_body.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/widgets/members_body.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/widgets/stepper_widget.dart';
 
 class CreateGroupBody extends StatefulWidget {
-  const CreateGroupBody({super.key});
+  const CreateGroupBody({super.key, required this.groupType});
+
+  final ScopeTab groupType;
 
   @override
   State<CreateGroupBody> createState() => _CreateGroupBodyState();
@@ -15,6 +22,9 @@ class CreateGroupBody extends StatefulWidget {
 class _CreateGroupBodyState extends State<CreateGroupBody> {
   int currentStep = 0;
   final PageController _pageController = PageController();
+
+  String groupName = '';
+  String groupDescription = '';
 
   final List<Color> colors = [
     const Color(0xFFFFC1BE),
@@ -45,50 +55,113 @@ class _CreateGroupBodyState extends State<CreateGroupBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          StepperWidget(currentStep: currentStep),
+    return BlocListener<CreateGroupCubit, CreateGroupState>(
+      listener: (context, state) {
+        if (state is CreateGroupSuccess) {
+          Navigator.pop(context);
 
-          const SizedBox(height: 40),
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Group created successfully ")),
+          );
+        }
 
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  currentStep = index;
-                });
-              },
-              children: [
-                Align(
-                  alignment: AlignmentGeometry.topCenter,
-                  child: DetailsBody(),
-                ),
-                
-                AppearanceBody(
-                  colors: colors,
-                  selectedColor: selectedColor,
-                  onColorSelected: (color) {
-                    setState(() {
-                      selectedColor = color;
-                    });
-                  },
-                ),
-                MembersBody(selectedColor: selectedColor),
-              ],
+        if (state is CreateGroupFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errMessage)));
+        }
+        if (state is CreateGroupLoading) {
+          const Center(child: CircularProgressIndicator());
+        }
+      },
+
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: [
+            StepperWidget(currentStep: currentStep),
+
+            const SizedBox(height: 40),
+
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    currentStep = index;
+                  });
+                },
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: DetailsBody(
+                      onNameChanged: (data) {
+                        groupName = data;
+                      },
+                      onDesChanged: (data) {
+                        groupDescription = data;
+                      },
+                    ),
+                  ),
+
+                  AppearanceBody(
+                    colors: colors,
+                    selectedColor: selectedColor,
+                    onColorSelected: (color) {
+                      setState(() {
+                        selectedColor = color;
+                      });
+                    }, name: groupName,
+                  ),
+
+                  MembersBody(selectedColor: selectedColor, name: groupName,),
+                ],
+              ),
             ),
-          ),
 
-          CustomButton(
-            onTap: nextStep,
-            title: currentStep == 2 ? "Create Group" : "Continue",
-          ),
-          SizedBox(height: 16),
-        ],
+            BlocBuilder<CreateGroupCubit, CreateGroupState>(
+              builder: (context, state) {
+                final isLoading = state is CreateGroupLoading;
+
+                return CustomButton(
+                  onTap: isLoading
+                      ? null
+                      : () {
+                          if (currentStep == 2) {
+                            BlocProvider.of<CreateGroupCubit>(
+                              context,
+                            ).createGroup(
+                              GroupEntity(
+                                groupId: '',
+                                name: groupName,
+                                description: groupDescription,
+                                createdByUid:
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                createdAt: DateTime.now(),
+                                colorHex:
+                                    '#${selectedColor.value.toRadixString(16).substring(2)}',
+                                memberUids: [
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                ],
+                                status: GroupLife.active,
+                                type: widget.groupType,
+                              ),
+                            );
+                          } else {
+                            nextStep();
+                          }
+                        },
+                  title: currentStep == 2
+                      ? (isLoading ? "Creating..." : "Create Group")
+                      : "Continue",
+                );
+              },
+            ),
+
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
-  
   }
 }

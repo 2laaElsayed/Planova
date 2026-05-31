@@ -9,11 +9,13 @@ class AppearanceBody extends StatelessWidget {
     required this.colors,
     required this.selectedColor,
     required this.onColorSelected,
+    required this.name,
   });
 
   final List<Color> colors;
   final Color selectedColor;
   final Function(Color) onColorSelected;
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class AppearanceBody extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PreviewCard(color: selectedColor),
+          PreviewCard(color: selectedColor, name: name),
 
           const SizedBox(height: 24),
 
@@ -70,9 +72,6 @@ class AppearanceBody extends StatelessWidget {
           SizedBox(height: 16),
         ],
       ),
-    
     );
   }
 }
-
-

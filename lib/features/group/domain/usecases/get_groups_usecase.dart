@@ -3,11 +3,11 @@ import 'package:planova_app/core/errors/failure.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 import 'package:planova_app/features/group/domain/repos/groups_repo.dart';
 
-class CreateGroupUsecase {
+class GetGroupsUsecase {
   final GroupsRepo repo;
 
-  CreateGroupUsecase({required this.repo});
-  Future<Either<Failure, void>> createGroup(GroupEntity group) async {
-    return await repo.createGroup(group);
+  GetGroupsUsecase({required this.repo});
+  Future<Either<Failure, List<GroupEntity>>> getGroups() async {
+    return await repo.getGroups();
   }
 }

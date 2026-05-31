@@ -3,6 +3,7 @@ import 'package:planova_app/features/group/data/models/group_item.dart';
 class GroupEntity {
   final String groupId;
   final String name;
+  final String description;
   final String createdByUid;
   final DateTime createdAt;
   final String colorHex;
@@ -13,6 +14,7 @@ class GroupEntity {
   GroupEntity({
     required this.groupId,
     required this.name,
+    required this.description,
     required this.createdByUid,
     required this.createdAt,
     required this.colorHex,

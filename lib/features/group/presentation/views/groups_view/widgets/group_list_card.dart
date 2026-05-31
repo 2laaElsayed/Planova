@@ -3,19 +3,22 @@ import 'package:go_router/go_router.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_router.dart';
 import 'package:planova_app/features/group/data/models/group_item.dart';
+import 'package:planova_app/features/group/data/models/group_model.dart';
+import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/avatar_square.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/members_stack.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/scope_badge.dart';
 
 class GroupListCard extends StatelessWidget {
   const GroupListCard({super.key, required this.group});
-  final GroupItem group;
+  final GroupEntity group;
 
   @override
   Widget build(BuildContext context) {
-    final percent = (group.progress * 100).round();
+    final percent = 0;
     return GestureDetector(
-      onTap: () => GoRouter.of(context).push(AppRouter.kGroupDetailsView),
+      onTap: () =>
+          GoRouter.of(context).push(AppRouter.kGroupDetailsView, extra: group),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -27,7 +30,7 @@ class GroupListCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                AvatarSquare(color: group.accent, text: group.title[0]),
+                AvatarSquare(color: group.accentColor, text: group.name[0]),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -38,11 +41,11 @@ class GroupListCard extends StatelessWidget {
                           Icon(
                             Icons.circle,
                             size: 7,
-                            color: group.life.dotColor,
+                            color: group.status.dotColor,
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            group.life.badge,
+                            group.status.badge,
                             style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black45,
@@ -51,7 +54,7 @@ class GroupListCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            group.lastSeen,
+                            group.createdAt.toString(),
                             style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black38,
@@ -61,7 +64,7 @@ class GroupListCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        group.title,
+                        group.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.kTextDark,
@@ -95,18 +98,18 @@ class GroupListCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
-                value: group.progress,
+                value: 0,
                 minHeight: 5,
                 backgroundColor: const Color(0xFFEDF0F6),
-                valueColor: AlwaysStoppedAnimation<Color>(group.accent),
+                valueColor: AlwaysStoppedAnimation<Color>(group.accentColor),
               ),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
                 MembersStack(
-                  initials: group.memberInitials,
-                  extra: group.membersExtra,
+                  initials: group.memberUids,
+                  extra: group.memberUids.length,
                 ),
                 const SizedBox(width: 10),
                 Icon(
@@ -116,11 +119,11 @@ class GroupListCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 3),
                 Text(
-                  '${group.comments}',
+                  '0',
                   style: const TextStyle(fontSize: 12, color: Colors.black45),
                 ),
                 const Spacer(),
-                ScopeBadge(scope: group.scope),
+                ScopeBadge(scope: group.type),
               ],
             ),
           ],

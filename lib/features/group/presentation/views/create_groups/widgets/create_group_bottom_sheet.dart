@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_router.dart';
 import 'package:planova_app/core/constants/app_styles.dart';
+import 'package:planova_app/features/group/data/models/group_item.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/widgets/group_type_card.dart';
 
 class CreateGroupBottomSheet extends StatelessWidget {
@@ -43,26 +44,30 @@ class CreateGroupBottomSheet extends StatelessWidget {
 
           GroupTypeCard(
             icon: Icons.people_outline_rounded,
-            iconColor: const Color(0xFF4A65FF),
+            iconColor: AppColors.blue, //const Color(0xFF4A65FF),
             iconBgColor: const Color(0xFFEDF0FF),
             title: 'Team Group',
             subtitle: 'Collaborate with members',
             onTap: () {
               GoRouter.of(context).pop();
-              GoRouter.of(context).push(AppRouter.kCreateGroupView);
+              GoRouter.of(
+                context,
+              ).push(AppRouter.kCreateGroupView, extra: ScopeTab.team);
             },
           ),
           const SizedBox(height: 16),
 
           GroupTypeCard(
             icon: Icons.lock_outline_rounded,
-            iconColor: const Color(0xFF9E77ED),
-            iconBgColor: const Color(0xFFF4F3FF),
+            iconColor: AppColors.kPrimary, //const Color(0xFF9E77ED),
+            iconBgColor: const Color(0xFFF1F1FF),
             title: 'Personal Group',
             subtitle: 'Only visible to you',
             onTap: () {
               GoRouter.of(context).pop();
-              GoRouter.of(context).push(AppRouter.kCreateGroupView);
+              GoRouter.of(
+                context,
+              ).push(AppRouter.kCreateGroupView, extra: ScopeTab.personal);
             },
           ),
           const SizedBox(height: 16),

@@ -3,9 +3,9 @@ import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_styles.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton({super.key, required this.onTap, required this.title});
+  const CustomButton({super.key, this.onTap, required this.title});
 
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final String title;
   @override
   Widget build(BuildContext context) {

@@ -3,10 +3,11 @@ import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_styles.dart';
 
 class PreviewCard extends StatelessWidget {
-  const PreviewCard({super.key, required this.color, this.subtitle});
+  const PreviewCard({super.key, required this.color, this.subtitle, required this.name});
 
   final Color color;
   final String? subtitle;
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +29,9 @@ class PreviewCard extends StatelessWidget {
                 color: color,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Center(
+              child:  Center(
                 child: Text(
-                  "M",
+                  name[0],
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -41,7 +42,7 @@ class PreviewCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              "Molecular Biology",
+              name,
               style: AppStyles.styleSemiBold16.copyWith(
                 color: AppColors.kDarkBlue,
               ),

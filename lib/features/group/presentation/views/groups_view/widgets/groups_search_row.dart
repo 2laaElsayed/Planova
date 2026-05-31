@@ -20,7 +20,10 @@ class GroupsSearchRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFE7E8F1)),
             ),
-            child: CustomTextField(hintText: "Search groups..."),
+            child: CustomTextField(
+              hintText: "Search groups...",
+              onchange: (p0) {},
+            ),
           ),
         ),
         const SizedBox(width: 8),

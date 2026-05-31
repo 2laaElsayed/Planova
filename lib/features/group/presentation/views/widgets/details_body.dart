@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:planova_app/core/widgets/custom_text_field.dart';
 
 class DetailsBody extends StatelessWidget {
-  const DetailsBody({super.key});
+  const DetailsBody({
+    super.key,
+    required this.onNameChanged,
+    required this.onDesChanged,
+  });
+  final Function(String) onNameChanged;
+  final Function(String) onDesChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,7 @@ class DetailsBody extends StatelessWidget {
           ),
         ],
       ),
-      child: const Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -31,7 +37,10 @@ class DetailsBody extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8),
-          CustomTextField(hintText: "What needs to be done?"),
+          CustomTextField(
+            hintText: "What needs to be done?",
+            onchange: onNameChanged,
+          ),
           SizedBox(height: 20),
           Text(
             "Description",
@@ -41,7 +50,11 @@ class DetailsBody extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8),
-          CustomTextField(hintText: "Add details...", maxLines: 4),
+          CustomTextField(
+            hintText: "Add details...",
+            maxLines: 4,
+            onchange: onDesChanged,
+          ),
         ],
       ),
     );
