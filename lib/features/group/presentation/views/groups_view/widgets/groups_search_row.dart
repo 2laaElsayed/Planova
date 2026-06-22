@@ -23,6 +23,10 @@ class GroupsSearchRow extends StatelessWidget {
             child: CustomTextField(
               hintText: "Search groups...",
               onchange: (p0) {},
+              icon: IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.search, color: AppColors.mediumGrey),
+              ),
             ),
           ),
         ),

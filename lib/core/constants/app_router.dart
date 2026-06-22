@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:planova_app/features/group/data/models/group_item.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
-import 'package:planova_app/features/group/presentation/views/groups_view/GroupsScreen.dart';
+import 'package:planova_app/features/group/presentation/views/groups_view/GroupsView.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/create_group_view.dart';
 import 'package:planova_app/features/group/presentation/views/edit_groups/edit_group_view.dart';
 import 'package:planova_app/features/group/presentation/views/group_details/groups_details_view.dart';
@@ -89,7 +89,7 @@ abstract class AppRouter {
         ),
         GoRoute(
           path: kGroupsScreen,
-          builder: (context, state) => const GroupsScreen(),
+          builder: (context, state) => const GroupsView(),
         ),
         GoRoute(
           path: kCreateGroupView,

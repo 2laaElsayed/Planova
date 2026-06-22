@@ -34,10 +34,8 @@ class GroupModel {
       createdAt: (json['created_at'] as Timestamp).toDate(),
       colorHex: json['color_hex'],
       memberUids: List<String>.from(json['member_uids']),
-      status: GroupLifeX.fromString(json['status'].toString().split('.').last),
-      type: ScopeTab.values.firstWhere(
-        (e) => e.name == json['type'].toString().split('.').last,
-      ),
+      status: GroupLife.values.firstWhere((e) => e.name == json['status']),
+      type: ScopeTab.values.firstWhere((e) => e.name == json['type']),
     );
   }
 
@@ -50,8 +48,8 @@ class GroupModel {
       'created_at': createdAt,
       'color_hex': colorHex,
       'member_uids': memberUids,
-      'status': status.toString(),
-      'type': type.toString(),
+      'status': status.name,
+      'type': type.name,
     };
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
+import 'package:planova_app/features/group/data/models/group_item.dart';
 import 'package:planova_app/features/group/data/models/group_model.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 
@@ -53,7 +54,7 @@ class GroupTopInfo extends StatelessWidget {
                     Icon(Icons.circle, size: 7, color: AppColors.kGreen),
                     SizedBox(width: 4),
                     Text(
-                      groupEntity.status.toString(),
+                      groupEntity.status.badge,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,

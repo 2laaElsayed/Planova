@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/widgets/custom_button.dart';
 import 'package:planova_app/features/group/data/models/group_item.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 import 'package:planova_app/features/group/presentation/manager/create_group_cubit/create_group_cubit.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/widgets/appearance_body.dart';
-import 'package:planova_app/features/group/presentation/views/widgets/details_body.dart';
+import 'package:planova_app/features/group/presentation/views/create_groups/widgets/details_body.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/widgets/members_body.dart';
 import 'package:planova_app/features/group/presentation/views/create_groups/widgets/stepper_widget.dart';
 
@@ -111,10 +112,11 @@ class _CreateGroupBodyState extends State<CreateGroupBody> {
                       setState(() {
                         selectedColor = color;
                       });
-                    }, name: groupName,
+                    },
+                    name: groupName,
                   ),
 
-                  MembersBody(selectedColor: selectedColor, name: groupName,),
+                  MembersBody(selectedColor: selectedColor, name: groupName),
                 ],
               ),
             ),
@@ -148,7 +150,17 @@ class _CreateGroupBodyState extends State<CreateGroupBody> {
                               ),
                             );
                           } else {
-                            nextStep();
+                            if (groupName.isNotEmpty &&
+                                groupDescription.isNotEmpty) {
+                              nextStep();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: AppColors.logoutRed,
+                                  content: Text("This fields Required"),
+                                ),
+                              );
+                            }
                           }
                         },
                   title: currentStep == 2

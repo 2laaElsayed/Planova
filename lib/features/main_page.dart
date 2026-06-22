@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:planova_app/features/tasks/screens/tasks_list_screen.dart';
 import '../core/widgets/custom_bottom_nav_bar.dart';
 import 'package:planova_app/features/home/presentation/views/home_view.dart';
-import 'package:planova_app/features/group/presentation/views/groups_view/GroupsScreen.dart';
+import 'package:planova_app/features/group/presentation/views/groups_view/GroupsView.dart';
 import 'package:planova_app/features/settings/screens/settings_screen.dart';
 
 class MainPage extends StatefulWidget {
@@ -19,7 +19,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> screens = const [
     HomeView(),
     TasksScreen(),
-    GroupsScreen(),
+    GroupsView(),
     SettingsScreen(),
   ];
 
