@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'custom_dropdown.dart';
+import 'package:provider/provider.dart';
+import '../../providers/new_task_provider.dart';
 
 class TaskOptionsRow extends StatefulWidget {
   const TaskOptionsRow({super.key});
@@ -17,30 +19,68 @@ class _TaskOptionsRowState extends State<TaskOptionsRow> {
     return Row(
       children: [
         Expanded(
-          
           child: CustomDropdown(
-            icon :Icon(Icons.outlined_flag , color: Color(0xFFE57373),),
+            icon: Icon(Icons.outlined_flag, color: Color(0xFFE57373)),
             label: "Priority",
-            items: const ["High", "Medium", "Low"],
-            value: priority,
-            onChanged: (val) {
+            items: [
+              DropdownItemModel(
+                value: "High",
+                icon: Icons.flag_outlined,
+                color: Colors.red,
+              ),
+              DropdownItemModel(
+                value: "Medium",
+                icon: Icons.flag_outlined,
+                color: Colors.orange,
+              ),
+              DropdownItemModel(
+                value: "Low",
+                icon: Icons.outlined_flag,
+                color: Colors.green,
+              ),
+            ],
+            onChanged: (value) {
               setState(() {
-                priority = val;
+                priority = value;
               });
+
+              context.read<NewTaskProvider>().setPriority(value!);
             },
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: CustomDropdown(
-            icon :Icon(Icons.group , color: Color(0xFF9BA3EB),),
+            icon: Icon(Icons.group, color: Color(0xFF9BA3EB)),
             label: "Group",
-            items: const ["Work", "Personal", "Health", "Study"],
-            value: group,
-            onChanged: (val) {
+            items: [
+              DropdownItemModel(
+                value: "Work",
+                icon: Icons.work,
+                color: Color(0xFF9BA3EB),
+              ),
+              DropdownItemModel(
+                value: "Personal",
+                icon: Icons.person,
+                color: Color(0xFF9BA3EB),
+              ),
+              DropdownItemModel(
+                value: "Health",
+                icon: Icons.favorite,
+                color: Color(0xFF9BA3EB),
+              ),
+              DropdownItemModel(
+                value: "Study",
+                icon: Icons.book,
+                color: Color(0xFF9BA3EB),
+              ),
+            ],
+            onChanged: (value) {
               setState(() {
-                group = val;
+                group = value;
               });
+
+              context.read<NewTaskProvider>().setGroup(null, value!);
             },
           ),
         ),

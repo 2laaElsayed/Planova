@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/tasks_provider.dart';
+import '../providers/new_task_provider.dart';
 import '../widgets/tasks_list_widgets/tasks_app_bar.dart';
 import '../widgets/tasks_list_widgets/date_selector.dart';
 import '../widgets/tasks_list_widgets/filter_tabs.dart';
 import '../widgets/tasks_list_widgets/section_header.dart';
 import '../widgets/tasks_list_widgets/task_card.dart';
-import 'package:planova_app/features/tasks/models/task_card_model.dart';
 import 'task_screen.dart';
+import '../models/task_card_model.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -15,115 +18,140 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  final List<TaskCardModel> personalTasks = [
-    TaskCardModel(
-        title: "Morning meditation",
-        date: "may 26",
-        isCompleted: true,
-        priority: TaskPriority.high),
-    TaskCardModel(
-        title: "Grocery shopping",
-        date: "june 26",
-        isCompleted: true,
-        priority: TaskPriority.medium),
-    TaskCardModel(
-        title: "Read 30 pages",
-        date: "july 26",
-        isCompleted: false,
-        priority: TaskPriority.low),
-  ];
-
-  final List<TaskCardModel> workTasks = [
-    TaskCardModel(
-        title: "Review pull requests",
-        date: "april 26",
-        isCompleted: true,
-        priority: TaskPriority.high),
-    TaskCardModel(
-        title: "Team standup",
-        date: "march 26",
-        isCompleted: false,
-        priority: TaskPriority.medium),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FE),
-      body: SafeArea(
-        child: Column(
-          children: [
-            TasksAppBar(
-              onAddPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const CreateTaskScreen(isEdit: false),
-                  ),
-                );
-              },
-            ),
+    return Consumer<TasksProvider>(
+      builder: (context, provider, child) {
+        final groupedTasks = provider.groupedTasks;
 
-            const HorizontalDateSelector(),
+        return Scaffold(
+          backgroundColor: const Color(0xFFF8F9FE),
+          body: SafeArea(
+            child: Column(
+              children: [
+                TasksAppBar(
+                  onAddPressed: () {
+                    context.read<NewTaskProvider>().clearTask();
 
-            FilterTabs(
-              tabs: const ["All", "Today", "Upcoming", "Done", "Priority"],
-              initialIndex: 1,
-              onTabSelected: (index) {
-                // filter logic
-              },
-            ),
-
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(bottom: 20),
-                children: [
-                  const SectionHeader(title: "Personal"),
-
-                  ...personalTasks.map((task) => TaskCard(
-                        task: task,
-                        onToggle: () {
-                          // toggle logic
-                        },
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const CreateTaskScreen(isEdit: true),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const CreateTaskScreen(isEdit: false),
+                      ),
+                    );
+                  },
+                ),
+                const HorizontalDateSelector(),
+                FilterTabs(
+                  tabs: const ["All", "Pending", "Done", "Upcoming"],
+                  initialIndex: provider.activeFilter.index,
+                  onTabSelected: (index) {
+                    provider.changeFilter(TaskFilter.values[index]);
+                  },
+                ),
+                Expanded(
+                  child: provider.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : provider.error != null
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Text(
+                              "Error loading tasks:\n${provider.error}",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.red),
                             ),
-                          );
-                        },
-                      )),
+                          ),
+                        )
+                      : ListView(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          children: [
+                            ...groupedTasks.entries.map((entry) {
+                              bool isOverdueSection =
+                                  entry.key == 'Overdue tasks';
 
-                  const SizedBox(height: 16),
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SectionHeader(title: entry.key),
+                                      if (isOverdueSection)
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 8.0),
+                                          child: Icon(
+                                            Icons.error_outline,
+                                            color: Colors.redAccent,
+                                            size: 22,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
 
-                  const SectionHeader(title: "Work"),
+                                  ...entry.value.map((task) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 12.0,
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          TaskCard(
+                                            task: TaskCardModel.fromTaskModel(
+                                              task,
+                                            ),
+                                            onToggle: () {
+                                              provider.toggleTask(task);
+                                            },
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      CreateTaskScreen(
+                                                        isEdit: true,
+                                                        task: task,
+                                                      ),
+                                                ),
+                                              );
+                                            },
+                                          ),
 
-                  ...workTasks.map((task) => TaskCard(
-                        task: task,
-                        onToggle: () {
-                          // toggle logic
-                        },
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const CreateTaskScreen(isEdit: true),
-                            ),
-                          );
-                        },
-                      )),
-                ],
-              ),
+                                          if (isOverdueSection)
+                                            Positioned(
+                                              left: 16,
+                                              top: 4,
+                                              bottom: 4,
+                                              child: Container(
+                                                width: 5,
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.redAccent,
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(12),
+                                                        bottomLeft:
+                                                            Radius.circular(12),
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                  const SizedBox(height: 16),
+                                ],
+                              );
+                            }),
+                          ],
+                        ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-
-      
+          ),
+        );
+      },
     );
   }
 }

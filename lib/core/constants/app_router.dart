@@ -22,6 +22,8 @@ abstract class AppRouter {
   static const String verifyCode = '/verifyCode';
   static const String changePassword = '/changePassword';
   static const String root = '/';
+  static const String createTaskScrren = '/CreateTaskScreen';
+  static const String tasksListScreen = '/TasksScreen';
   static const String kGroupsScreen = '/groupsScreen';
   static const String kCreateGroupView = '/CreateGroupView';
   static const String kGroupDetailsView = '/GroupDetailsView';
@@ -30,7 +32,7 @@ abstract class AppRouter {
   static GoRouter router(AuthProvider authProvider) {
     return GoRouter(
       refreshListenable: authProvider,
-      initialLocation: signIn,
+      initialLocation: root,
       redirect: (context, state) {
         final isLoggedIn = authProvider.isLoggedIn;
         final isEmailVerified = authProvider.isEmailVerified;
@@ -41,7 +43,7 @@ abstract class AppRouter {
             location == signUp ||
             location == resetPassword ||
             location == verifyCode;
-
+/*
         if (!isLoggedIn) {
           if (location == changePassword) return signIn;
           return isAuthRoute ? null : signIn;
@@ -54,7 +56,7 @@ abstract class AppRouter {
         if (isLoggedIn && isEmailVerified && isAuthRoute) {
           return root;
         }
-
+*/
         return null;
       },
       routes: [
