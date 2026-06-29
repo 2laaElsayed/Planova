@@ -153,4 +153,9 @@ class AppStyles {
     fontSize: 12,
     fontWeight: FontWeight.w400,
   );
+  static const styleRegular14 = TextStyle(
+    color: AppColors.mediumGrey,
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+  );
 }

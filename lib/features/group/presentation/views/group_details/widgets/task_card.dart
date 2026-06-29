@@ -1,27 +1,29 @@
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
+import 'package:planova_app/features/group/domain/entities/group_task_entity.dart';
 
 class TaskCard extends StatelessWidget {
-  final String title;
-  final String date;
-  final bool checked;
-  final String trailingLetter;
-  final Color trailingColor;
+  const TaskCard({super.key, required this.task, required this.onToggle});
 
-  const TaskCard({
-    super.key,
-    required this.title,
-    required this.date,
-    required this.checked,
-    required this.trailingLetter,
-    required this.trailingColor,
-  });
+  final GroupTaskEntity task;
+  final ValueChanged<bool> onToggle;
+
+  Color get _priorityColor {
+    switch (task.priority) {
+      case TaskPriority.high:
+        return const Color(0xFFE57373);
+      case TaskPriority.medium:
+        return const Color(0xFFF2C14E);
+      case TaskPriority.low:
+        return const Color(0xFF7CB97C);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: AppColors.kWhite,
         borderRadius: BorderRadius.circular(14),
@@ -29,69 +31,62 @@ class TaskCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-              color: checked ? const Color(0xFFECEBFF) : Colors.transparent,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: checked ? AppColors.kPrimary : const Color(0xFFD7DBE8),
+          GestureDetector(
+            onTap: () => onToggle(!task.isCompleted),
+            child: Container(
+              width: 22,
+              height: 22,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: task.isCompleted
+                    ? AppColors.kPrimary
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: task.isCompleted
+                      ? AppColors.kPrimary
+                      : AppColors.kStroke,
+                  width: 1.5,
+                ),
               ),
+              child: task.isCompleted
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : null,
             ),
-            child: checked
-                ? const Icon(Icons.check, size: 12, color: AppColors.kPrimary)
-                : null,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
+                  task.title,
+                  style: TextStyle(
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.kDarkBlue,
+                    decoration: task.isCompleted
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_today_outlined,
-                      size: 11,
-                      color: AppColors.kColdGrey,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      date,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.kColdGrey,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 2),
+                Text(
+                  DateFormat('MMM d').format(task.dueDate),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.kColdGrey,
+                  ),
                 ),
               ],
             ),
           ),
           Container(
-            width: 22,
-            height: 22,
-            alignment: Alignment.center,
+            width: 10,
+            height: 10,
             decoration: BoxDecoration(
-              color: trailingColor,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              trailingLetter,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.kColdGrey,
-                fontWeight: FontWeight.w700,
-              ),
+              color: _priorityColor,
+              shape: BoxShape.circle,
             ),
           ),
         ],

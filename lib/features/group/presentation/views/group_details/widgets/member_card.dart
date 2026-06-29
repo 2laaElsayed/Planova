@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/features/group/presentation/views/group_details/groups_details_view.dart';
@@ -8,6 +7,7 @@ class MemberCard extends StatelessWidget {
   final String name;
   final String role;
   final MemberTrailing trailing;
+  final VoidCallback? onDeletePressed;
 
   const MemberCard({
     super.key,
@@ -15,12 +15,13 @@ class MemberCard extends StatelessWidget {
     required this.name,
     required this.role,
     required this.trailing,
+    this.onDeletePressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: AppColors.kWhite,
         borderRadius: BorderRadius.circular(14),
@@ -60,20 +61,14 @@ class MemberCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   role,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.kColdGrey,
-                  ),
+                  style: const TextStyle(fontSize: 11, color: AppColors.kColdGrey),
                 ),
               ],
             ),
           ),
           trailing == MemberTrailing.admin
               ? Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEDEBFF),
                     borderRadius: BorderRadius.circular(10),
@@ -87,10 +82,15 @@ class MemberCard extends StatelessWidget {
                     ),
                   ),
                 )
-              : const Icon(
-                  Icons.delete_outline,
-                  size: 18,
-                  color: AppColors.kColdGrey,
+              : IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: onDeletePressed,
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    size: 18,
+                    color: AppColors.kColdGrey,
+                  ),
                 ),
         ],
       ),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
-import 'package:planova_app/features/group/presentation/data/models/group_item.dart';
+import 'package:planova_app/features/group/data/models/group_item.dart';
+import 'package:planova_app/features/group/domain/entities/group_entity.dart';
+import 'package:planova_app/features/group/presentation/manager/get_groups_cubit/get_groups_cubit.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/groups_activity_chips.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/groups_grid_view.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/groups_header.dart';
@@ -20,81 +23,23 @@ class _GroupsScreenBodyState extends State<GroupsScreenBody> {
   ScopeTab _scope = ScopeTab.all;
   ActivityFilter _activity = ActivityFilter.all;
   String _query = '';
-
-  final List<GroupItem> _groups = const [
-    GroupItem(
-      title: 'Climate Research',
-      life: GroupLife.active,
-      lastSeen: '2h ago',
-      progress: 0.50,
-      scope: ScopeTab.team,
-      accent: Color(0xFFF3C7C7),
-    ),
-    GroupItem(
-      title: 'Molecular Biology',
-      life: GroupLife.idle,
-      lastSeen: '2h ago',
-      progress: 0.50,
-      scope: ScopeTab.personal,
-      accent: Color(0xFFC9D9F8),
-      comments: 0,
-      memberInitials: ['S'],
-      membersExtra: 0,
-    ),
-    GroupItem(
-      title: 'Modern Art History',
-      life: GroupLife.idle,
-      lastSeen: '2h ago',
-      progress: 0.50,
-      scope: ScopeTab.team,
-      accent: Color(0xFFE2D1F1),
-    ),
-    GroupItem(
-      title: 'Python Foundations',
-      life: GroupLife.active,
-      lastSeen: '2h ago',
-      progress: 0.50,
-      scope: ScopeTab.team,
-      accent: Color(0xFFF1D8C3),
-      comments: 0,
-    ),
-    GroupItem(
-      title: 'World War',
-      life: GroupLife.active,
-      lastSeen: '2h ago',
-      progress: 0.50,
-      scope: ScopeTab.personal,
-      accent: Color(0xFFCFECEF),
-      comments: 0,
-      membersExtra: 0,
-      memberInitials: ['J'],
-    ),
-    GroupItem(
-      title: 'Calculus Workshop',
-      life: GroupLife.idle,
-      lastSeen: '2h ago',
-      progress: 0.50,
-      scope: ScopeTab.team,
-      accent: Color(0xFFD4D8F7),
-    ),
-  ];
-
-  List<GroupItem> get _filtered {
-    return _groups.where((g) {
+  List<GroupEntity> filterGroups(List<GroupEntity> groups) {
+    return groups.where((g) {
       final q = _query.trim().toLowerCase();
-      final byQuery = q.isEmpty || g.title.toLowerCase().contains(q);
+
+      final byQuery = q.isEmpty || g.name.toLowerCase().contains(q);
 
       final byScope = switch (_scope) {
         ScopeTab.all => true,
-        ScopeTab.team => g.scope == ScopeTab.team,
-        ScopeTab.personal => g.scope == ScopeTab.personal,
+        ScopeTab.team => g.type == ScopeTab.team,
+        ScopeTab.personal => g.type == ScopeTab.personal,
       };
 
       final byActivity = switch (_activity) {
         ActivityFilter.all => true,
-        ActivityFilter.active => g.life == GroupLife.active,
-        ActivityFilter.completed => g.life == GroupLife.completed,
-        ActivityFilter.archived => g.life == GroupLife.archived,
+        ActivityFilter.active => g.status == GroupLife.active,
+        ActivityFilter.completed => g.status == GroupLife.completed,
+        ActivityFilter.archived => g.status == GroupLife.archived,
       };
 
       return byQuery && byScope && byActivity;
@@ -128,15 +73,32 @@ class _GroupsScreenBodyState extends State<GroupsScreenBody> {
                 onChange: (a) => setState(() => _activity = a),
               ),
               const SizedBox(height: 8),
-              Expanded(
-                child: _filtered.isEmpty
-                    ? const Center(child: Text('No groups found'))
-                    : AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 220),
-                        child: _mode == ViewMode.list
-                            ? GroupsListView(groups: _filtered)
-                            : GroupsGridView(groups: _filtered),
+              BlocBuilder<GetGroupsCubit, GetGroupsState>(
+                builder: (context, state) {
+                  if (state is GetGroupsLoading) {
+                    return Expanded(
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primaryColor,
+                        ),
                       ),
+                    );
+                  } else if (state is GetGroupsSuccess) {
+                    final filteredGroups = filterGroups(state.groups);
+
+                    return Expanded(
+                      child: filteredGroups.isEmpty
+                          ? const Center(child: Text('No groups found'))
+                          : AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 220),
+                              child: _mode == ViewMode.list
+                                  ? GroupsListView(groups: filteredGroups)
+                                  : GroupsGridView(groups: filteredGroups),
+                            ),
+                    );
+                  }
+                  return SizedBox();
+                },
               ),
             ],
           ),

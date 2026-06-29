@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_styles.dart';
@@ -29,9 +28,9 @@ class ColorsWidget extends StatelessWidget {
             ),
           ),
         ),
-    
+
         const SizedBox(height: 16),
-    
+
         Container(
           decoration: BoxDecoration(
             color: AppColors.kWhite,

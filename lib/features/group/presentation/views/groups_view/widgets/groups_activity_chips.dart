@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
-import 'package:planova_app/features/group/presentation/data/models/group_item.dart';
+import 'package:planova_app/features/group/data/models/group_item.dart';
 
 class GroupsActivityChips extends StatelessWidget {
   final ActivityFilter selected;
@@ -20,12 +20,9 @@ class GroupsActivityChips extends StatelessWidget {
       return GestureDetector(
         onTap: () => onChange(value),
         child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.kPrimary
-                : const Color(0xFFEFF0F5),
+            color: isSelected ? AppColors.kPrimary : const Color(0xFFEFF0F5),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Text(

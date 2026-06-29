@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/widgets/custom_button.dart';
 import 'package:planova_app/features/group/presentation/views/widgets/colors_widget.dart';
-import 'package:planova_app/features/group/presentation/views/widgets/details_body.dart';
 import 'package:planova_app/features/group/presentation/views/edit_groups/widgets/preview_card.dart';
 
 class EditGroupViewBody extends StatefulWidget {
@@ -42,9 +40,9 @@ class _EditGroupViewBodyState extends State<EditGroupViewBody> {
               child: Column(
                 children: [
                   SizedBox(height: 16),
-                  PreviewCard(color: AppColors.kPrimary),
+                  PreviewCard(color: AppColors.kPrimary, name: 'Malecular Biology',),
                   SizedBox(height: 16),
-                  DetailsBody(),
+                  // DetailsBody(),
                   SizedBox(height: 16),
                   ColorsWidget(
                     colors: colors,

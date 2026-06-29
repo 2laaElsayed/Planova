@@ -42,7 +42,6 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget _item(String icon, String label, int index) {
     final isSelected = currentIndex == index;
 
-    // outlined → filled icons
     String selectedIcon;
     switch (icon) {
       case Assets.imagesHomeOutline:

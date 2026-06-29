@@ -1,34 +1,29 @@
-
 import 'package:flutter/material.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 
-class GroupTabsBar extends StatelessWidget {
+class GroupTabsBar extends StatelessWidget implements PreferredSizeWidget {
   const GroupTabsBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 38,
+      height: 40,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFEEF0F6),
+        color: const Color(0xFFF1F1F6),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const TabBar(
-        dividerColor: Colors.transparent,
-        indicatorSize: TabBarIndicatorSize.tab,
+      child: TabBar(
         indicator: BoxDecoration(
           color: AppColors.kPrimary,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+          borderRadius: BorderRadius.circular(10),
         ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: AppColors.kDarkBlue,
-        labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-        unselectedLabelStyle: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-        tabs: [
+        unselectedLabelColor: AppColors.kColdGrey,
+        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        tabs: const [
           Tab(text: 'Tasks'),
           Tab(text: 'Members'),
           Tab(text: 'Chat'),
@@ -36,4 +31,7 @@ class GroupTabsBar extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(40);
 }
