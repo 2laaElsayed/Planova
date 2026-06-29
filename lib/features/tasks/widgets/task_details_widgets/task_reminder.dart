@@ -1,40 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class TaskReminder extends StatefulWidget {
+import '../../providers/new_task_provider.dart';
+
+class TaskReminder extends StatelessWidget {
   const TaskReminder({super.key});
 
   @override
-  State<TaskReminder> createState() => _TaskReminderState();
-}
-
-class _TaskReminderState extends State<TaskReminder> {
-  bool isEnabled = false;
-
-  @override
   Widget build(BuildContext context) {
+
+    final provider = context.watch<NewTaskProvider>();
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 2),
+
       decoration: BoxDecoration(
         color: Colors.white,
+
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[100]!),
+
+        border: Border.all(
+          color: Colors.grey[100]!,
+        ),
       ),
+
       child: ListTile(
+
         leading: const Icon(
           Icons.notifications_none,
           color: Color(0xFF9BA3EB),
           size: 28,
         ),
-        title: const Text("Reminder" , style: TextStyle(color: Color(0xFFACACAD))),
+
+        title: const Text(
+          "Reminder",
+          style: TextStyle(
+            color: Color(0xFFACACAD),
+          ),
+        ),
+
         subtitle: const Text(
           "Get notified before due date",
         ),
+
         trailing: Switch(
-          value: isEnabled,
+
+          value: provider.reminderEnabled,
+
           onChanged: (value) {
-            setState(() {
-              isEnabled = value;
-            });
+
+            provider.toggleReminder(value);
           },
         ),
       ),

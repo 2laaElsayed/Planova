@@ -20,6 +20,8 @@ abstract class AppRouter {
   static const String verifyCode = '/verifyCode';
   static const String changePassword = '/changePassword';
   static const String root = '/';
+  static const String createTaskScrren = '/CreateTaskScreen';
+  static const String tasksListScreen = '/TasksScreen';
   static const String kGroupsScreen = '/groupsScreen';
   static const String kCreateGroupView = '/CreateGroupView';
   static const String kGroupDetailsView = '/GroupDetailsView';
@@ -28,7 +30,7 @@ abstract class AppRouter {
   static GoRouter router(AuthProvider authProvider) {
     return GoRouter(
       refreshListenable: authProvider,
-      initialLocation: signIn,
+      initialLocation: root,
       redirect: (context, state) {
         final isLoggedIn = authProvider.isLoggedIn;
         final isEmailVerified = authProvider.isEmailVerified;
@@ -39,7 +41,7 @@ abstract class AppRouter {
             location == signUp ||
             location == resetPassword ||
             location == verifyCode;
-
+/*
         if (!isLoggedIn) {
         
           if (location == changePassword) return signIn;
@@ -53,7 +55,7 @@ abstract class AppRouter {
         if (isLoggedIn && isEmailVerified && isAuthRoute) {
           return root;
         }
-
+*/
         return null;
       },
       routes: [
@@ -63,8 +65,8 @@ abstract class AppRouter {
         GoRoute(path: verifyCode, builder: (context, state) => const VerifyCodeScreen()),
         GoRoute(path: changePassword, builder: (context, state) => const ChangePasswordScreen()),
         GoRoute(path: root, builder: (context, state) => const MainPage()),
-        GoRoute(path: '/tasksScreen', builder: (context, state) => const TasksScreen()),
-        GoRoute(path: '/createTaskScreen', builder: (context, state) => const CreateTaskScreen()),
+        GoRoute(path: tasksListScreen, builder: (context, state) => const TasksScreen()),
+        GoRoute(path: createTaskScrren, builder: (context, state) => const CreateTaskScreen()),
         GoRoute(path: kGroupsScreen, builder: (context, state) => const GroupsScreen()),
         GoRoute(path: kCreateGroupView, builder: (context, state) => const CreateGroupView()),
         GoRoute(path: kGroupDetailsView, builder: (context, state) => const GroupsDetailsView()),

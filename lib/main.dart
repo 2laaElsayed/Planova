@@ -7,6 +7,9 @@ import 'package:planova_app/core/constants/app_router.dart';
 import 'package:planova_app/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'features/auth/providers/auth_provider.dart';
+import 'package:planova_app/features/tasks/providers/tasks_provider.dart';
+import 'package:planova_app/features/tasks/repositories/task_repository.dart';
+import 'package:planova_app/features/tasks/providers/new_task_provider.dart';
 
 void main()async {  
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +18,20 @@ void main()async {
   );
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      providers: [
+
+    ChangeNotifierProvider(
+      create: (_) => AuthProvider(),
+    ),
+
+    ChangeNotifierProvider(
+      create: (_) => TasksProvider(TaskRepository()),
+    ),
+
+    ChangeNotifierProvider(
+  create: (_) => NewTaskProvider(TaskRepository()),
+),
+  ],
       child: DevicePreview(enabled: true, builder: (context) => const MyApp()),
     ),
   );
