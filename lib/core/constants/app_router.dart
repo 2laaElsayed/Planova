@@ -12,11 +12,13 @@ import 'package:planova_app/features/main_page.dart';
 import 'package:planova_app/features/auth/providers/auth_provider.dart';
 import 'package:planova_app/features/auth/screens/verify_code_screen.dart';
 import 'package:planova_app/features/auth/screens/change_password_screen.dart';
+import 'package:planova_app/features/splash/presentation/views/splash_view.dart';
 import 'package:planova_app/features/tasks/models/TaskModel.dart';
 import 'package:planova_app/features/tasks/screens/task_screen.dart';
 import 'package:planova_app/features/tasks/screens/tasks_list_screen.dart';
 
 abstract class AppRouter {
+  static const String splash = '/splash';
   static const String signIn = '/signIn';
   static const String signUp = '/signUp';
   static const String resetPassword = '/resetPassword';
@@ -34,12 +36,12 @@ abstract class AppRouter {
     return GoRouter(
       refreshListenable: authProvider,
       // 1. Start the app at the sign-in screen
-      initialLocation: signIn,
+      initialLocation: splash,
       redirect: (context, state) {
         final isLoggedIn = authProvider.isLoggedIn;
         final isEmailVerified = authProvider.isEmailVerified;
         final location = state.uri.toString();
-
+        if (location == splash) return null;
         final isAuthRoute =
             location == signIn ||
             location == signUp ||
@@ -63,6 +65,7 @@ abstract class AppRouter {
         return null;
       },
       routes: [
+        GoRoute(path: splash, builder: (context, state) => const SplashView()),
         GoRoute(
           path: signIn,
           builder: (context, state) => const SignInScreen(),
