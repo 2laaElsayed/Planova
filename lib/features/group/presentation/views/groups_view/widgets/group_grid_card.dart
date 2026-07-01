@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_router.dart';
+import 'package:planova_app/core/utils/date_time_extensions.dart';
 import 'package:planova_app/features/group/data/models/group_item.dart';
 import 'package:planova_app/features/group/data/models/group_model.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
@@ -41,9 +42,9 @@ class GroupGridCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   group.status.badge,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 9,
-                    color: Colors.black45,
+                    color: group.status.dotColor,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -62,8 +63,8 @@ class GroupGridCard extends StatelessWidget {
             ),
             const SizedBox(height: 3),
             Text(
-              group.createdAt.toString(),
-              style: const TextStyle(fontSize: 11, color: Colors.black45),
+              formatTimeAgo(group.createdAt),
+              style: const TextStyle(fontSize: 10, color: Colors.black38),
             ),
             const SizedBox(height: 8),
             ScopeBadge(scope: group.type),
