@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:planova_app/core/constants/app_colors.dart';
-import 'profile_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:planova_app/features/auth/providers/auth_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../providers/settings_provider.dart';
+import 'profile_screen.dart';
 
 class PrivacySecurityScreen extends StatefulWidget {
   const PrivacySecurityScreen({super.key});
@@ -16,20 +16,15 @@ class PrivacySecurityScreen extends StatefulWidget {
 }
 
 class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
-  
-  @override
-  void initState() {
-    super.initState();
+  bool _isDeleting = false;
 
-    Future.microtask(() {
-      if (mounted) {
-        context.read<AuthProvider>().fetchUserData();
-      }
-    });
-  }
+  Future<void> _showDeleteConfirmDialog(BuildContext context) async {
+    final provider = context.read<SettingsProvider>();
+    final auth = context.read<AuthProvider>();
+    final goRouter = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
 
-  void _showDeleteConfirmDialog(BuildContext context) {
-    showDialog(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -46,7 +41,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 'Cancel',
                 style: GoogleFonts.poppins(color: AppColors.textGrey),
@@ -59,17 +54,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Account deletion confirmed.',
-                      style: GoogleFonts.poppins(),
-                    ),
-                  ),
-                );
-              },
+              onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 'Delete',
                 style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
@@ -79,6 +64,31 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
         );
       },
     );
+
+    if (!mounted) return;
+    if (confirmed != true) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      await provider.deleteAccount();
+      await auth.logout();
+      if (!mounted) return;
+      goRouter.go('/signIn');
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.toString(), style: GoogleFonts.poppins())),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
   }
 
   Widget _buildTrailingIcon(Color color) {
@@ -87,17 +97,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
-
-    final String userName = authProvider.userData?['full_name'] ?? "Loading...";
-    final dynamic passwordData = authProvider.userData?['passwordChangedAt'];
-    DateTime? lastChanged;
-
-    if (passwordData is Timestamp) {
-      lastChanged = passwordData.toDate();
-    } else if (passwordData is DateTime) {
-      lastChanged = passwordData;
-    }
+    final user = context.watch<SettingsProvider>().user;
+    final String userName = user?.fullName ?? 'Loading...';
+    final DateTime? lastChanged = user?.passwordChangedAt;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -135,9 +137,12 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [                 
+                children: [
                   ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 4,
+                    ),
                     leading: Container(
                       width: 42,
                       height: 42,
@@ -156,7 +161,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                       ),
                     ),
                     subtitle: Text(
-                      userName, 
+                      userName,
                       style: GoogleFonts.poppins(
                         color: AppColors.textGrey,
                         fontSize: 13,
@@ -166,14 +171,21 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => const ProfileScreen(),
+                          builder: (routeContext) =>
+                              ChangeNotifierProvider<SettingsProvider>.value(
+                                value: context.read<SettingsProvider>(),
+                                child: const ProfileScreen(),
+                              ),
                         ),
                       );
                     },
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 4,
+                    ),
                     leading: Container(
                       width: 42,
                       height: 42,
@@ -205,7 +217,10 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                   ),
                   const Divider(height: 1, indent: 16, endIndent: 16),
                   ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 4,
+                    ),
                     leading: Container(
                       width: 42,
                       height: 42,
@@ -213,7 +228,10 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                         color: const Color(0xFFFFEBEE),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.delete_outline, color: Color(0xFFE53935)),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Color(0xFFE53935),
+                      ),
                     ),
                     title: Text(
                       'Delete Account',
@@ -231,7 +249,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                       ),
                     ),
                     trailing: _buildTrailingIcon(const Color(0xFFE53935)),
-                    onTap: () => _showDeleteConfirmDialog(context),
+                    onTap: _isDeleting
+                        ? null
+                        : () => _showDeleteConfirmDialog(context),
                   ),
                 ],
               ),

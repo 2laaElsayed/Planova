@@ -9,7 +9,7 @@ import 'package:planova_app/features/auth/screens/reset_password_screen.dart';
 import 'package:planova_app/features/main_page.dart';
 import 'package:planova_app/features/auth/providers/auth_provider.dart';
 import 'package:planova_app/features/auth/screens/verify_code_screen.dart';
-import 'package:planova_app/features/auth/screens/change_password_screen.dart';
+import 'package:planova_app/features/settings/screens/change_password_screen.dart';
 import 'package:planova_app/features/tasks/screens/task_screen.dart';
 import 'package:planova_app/features/tasks/screens/tasks_list_screen.dart';
 
