@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
+import 'package:provider/provider.dart';
+import 'package:planova_app/features/auth/providers/auth_provider.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -50,10 +52,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+              const BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.04),
                 blurRadius: 8,
-                offset: const Offset(0, 3),
+                offset: Offset(0, 3),
               ),
             ],
           ),
@@ -97,8 +99,49 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
+  Future<void> _handleChange() async {
+    if (_formKey.currentState?.validate() != true) return;
+
+    final oldPassword = _currentController.text.trim();
+    final newPassword = _newController.text.trim();
+    final confirmPassword = _confirmController.text.trim();
+
+    if (newPassword != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Passwords do not match', style: GoogleFonts.poppins()),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await context.read<AuthProvider>().changePassword(
+            oldPassword: oldPassword,
+            newPassword: newPassword,
+          );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Password updated successfully', style: GoogleFonts.poppins()),
+        ),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString(), style: GoogleFonts.poppins()),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<AuthProvider>().isLoading;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
@@ -194,25 +237,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () {
-                          if (_formKey.currentState?.validate() == true) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Password updated successfully ✅',
-                                  style: GoogleFonts.poppins(),
+                        onPressed: isLoading ? null : _handleChange,
+                        child: isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                'Save Changes',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
                                 ),
                               ),
-                            );
-                          }
-                        },
-                        child: Text(
-                          'Save Changes',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
                       ),
                     ),
                   ],
