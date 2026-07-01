@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_router.dart';
+import 'package:planova_app/core/utils/date_time_extensions.dart';
 import 'package:planova_app/features/group/data/models/group_item.dart';
 import 'package:planova_app/features/group/data/models/group_model.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
@@ -36,6 +37,14 @@ class GroupListCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        group.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.kTextDark,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
                           Icon(
@@ -46,29 +55,21 @@ class GroupListCard extends StatelessWidget {
                           const SizedBox(width: 5),
                           Text(
                             group.status.badge,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: Colors.black45,
+                              color: group.status.dotColor,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            group.createdAt.toString(),
+                            formatTimeAgo(group.createdAt),
                             style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black38,
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        group.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.kTextDark,
-                        ),
                       ),
                     ],
                   ),

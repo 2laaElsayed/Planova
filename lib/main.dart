@@ -9,6 +9,7 @@ import 'package:planova_app/core/di/service_locator.dart';
 import 'package:planova_app/core/utils/app_bloc_observer.dart';
 import 'package:planova_app/firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'package:planova_app/features/tasks/providers/tasks_provider.dart';
 import 'package:planova_app/features/tasks/repositories/task_repository.dart';
@@ -24,9 +25,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-
         Provider<TaskRepository>(create: (_) => TaskRepository()),
-
         ChangeNotifierProvider(
           create: (context) => TasksProvider(context.read<TaskRepository>()),
         ),
@@ -39,24 +38,35 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  State<MyApp> createState() => _MyAppState();
+}
 
+class _MyAppState extends State<MyApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final authProvider = context.read<AuthProvider>();
+    _router = AppRouter.router(authProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
 
-      // Device Preview
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
 
-      routerConfig: AppRouter.router(authProvider),
+      routerConfig: _router,
 
-      // Theme
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

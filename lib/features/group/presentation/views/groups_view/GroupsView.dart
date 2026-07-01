@@ -15,7 +15,7 @@ class GroupsView extends StatelessWidget {
       ],
 
       child: const Scaffold(
-        // backgroundColor: Color.fromARGB(255, 184, 184, 224),
+       
         body: SafeArea(child: GroupsScreenBody()),
       ),
     );
