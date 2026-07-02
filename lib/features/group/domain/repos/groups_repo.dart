@@ -41,5 +41,13 @@ abstract class GroupsRepo {
   });
   Stream<Either<Failure, List<GroupMessageEntity>>> getChatMessagesStream(
     String groupId,
-  );
+  );// Add this inside GroupsRepoImpl
+ Future<Either<Failure, void>> updateGroupTask({
+    required String groupId,
+    required String taskId,
+    required String title,
+    required String description,
+    required String priority,
+    required DateTime dueDate,
+  });
 }

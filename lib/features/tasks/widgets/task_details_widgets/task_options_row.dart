@@ -1,88 +1,83 @@
 import 'package:flutter/material.dart';
-import 'custom_dropdown.dart';
 import 'package:provider/provider.dart';
+import 'custom_dropdown.dart';
 import '../../providers/new_task_provider.dart';
 
-class TaskOptionsRow extends StatefulWidget {
+class TaskOptionsRow extends StatelessWidget {
   const TaskOptionsRow({super.key});
 
   @override
-  State<TaskOptionsRow> createState() => _TaskOptionsRowState();
-}
-
-class _TaskOptionsRowState extends State<TaskOptionsRow> {
-  String? priority;
-  String? group;
-
-  @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: CustomDropdown(
-            icon: Icon(Icons.outlined_flag, color: Color(0xFFE57373)),
-            label: "Priority",
-            items: [
-              DropdownItemModel(
-                value: "High",
-                icon: Icons.flag_outlined,
-                color: Colors.red,
-              ),
-              DropdownItemModel(
-                value: "Medium",
-                icon: Icons.flag_outlined,
-                color: Colors.orange,
-              ),
-              DropdownItemModel(
-                value: "Low",
-                icon: Icons.outlined_flag,
-                color: Colors.green,
-              ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                priority = value;
-              });
+    final provider = context.watch<NewTaskProvider>();
 
-              context.read<NewTaskProvider>().setPriority(value!);
-            },
-          ),
+    List<DropdownItemModel> groupItems = [
+      DropdownItemModel(
+        value: "Personal Tasks",
+        icon: Icons.person,
+        color: const Color(0xFF9BA3EB),
+      ),
+    ];
+
+    groupItems.addAll(
+      provider.availableGroups.map(
+        (g) => DropdownItemModel(
+          value: g.name,
+          icon: Icons.group,
+          color: const Color(0xFF9BA3EB),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: CustomDropdown(
-            icon: Icon(Icons.group, color: Color(0xFF9BA3EB)),
-            label: "Group",
-            items: [
-              DropdownItemModel(
-                value: "Work",
-                icon: Icons.work,
-                color: Color(0xFF9BA3EB),
-              ),
-              DropdownItemModel(
-                value: "Personal",
-                icon: Icons.person,
-                color: Color(0xFF9BA3EB),
-              ),
-              DropdownItemModel(
-                value: "Health",
-                icon: Icons.favorite,
-                color: Color(0xFF9BA3EB),
-              ),
-              DropdownItemModel(
-                value: "Study",
-                icon: Icons.book,
-                color: Color(0xFF9BA3EB),
-              ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                group = value;
-              });
+      ),
+    );
 
-              context.read<NewTaskProvider>().setGroup(null, value!);
-            },
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        CustomDropdown(
+          icon: const Icon(Icons.outlined_flag, color: Color(0xFFE57373)),
+          label: "Priority",
+          items: [
+            DropdownItemModel(
+              value: "High",
+              icon: Icons.flag_outlined,
+              color: Colors.red,
+            ),
+            DropdownItemModel(
+              value: "Medium",
+              icon: Icons.flag_outlined,
+              color: Colors.orange,
+            ),
+            DropdownItemModel(
+              value: "Low",
+              icon: Icons.outlined_flag,
+              color: Colors.green,
+            ),
+          ],
+          onChanged: (value) {
+            if (value != null) {
+              provider.setPriority(value.toLowerCase());
+            }
+          },
+        ),
+        
+        const SizedBox(height: 16),
+        
+        CustomDropdown(
+          icon: const Icon(Icons.group, color: Color(0xFF9BA3EB)),
+          label: "Group",
+          items: groupItems,
+          onChanged: (value) {
+            if (value == "Personal Tasks" || value == null) {
+              provider.setGroup(null, null);
+            } else {
+              try {
+                final selectedGroup = provider.availableGroups.firstWhere(
+                  (g) => g.name == value,
+                );
+                provider.setGroup(selectedGroup.groupId, selectedGroup.name);
+              } catch (e) {
+                provider.setGroup(null, null);
+              }
+            }
+          },
         ),
       ],
     );

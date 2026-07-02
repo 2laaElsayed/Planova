@@ -86,6 +86,7 @@ Future<void> initializeDependencies() async {
     () => CreateTaskCubit(
       createGroupTaskUseCase: getIt<CreateGroupTaskUseCase>(),
       getMyGroupsUseCase: getIt<GetMyGroupsUseCase>(),
+      groupsRepo: getIt<GroupsRepo>(), 
     ),
   );
 }

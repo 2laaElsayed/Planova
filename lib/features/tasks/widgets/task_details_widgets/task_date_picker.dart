@@ -9,7 +9,6 @@ class TaskDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final provider = context.watch<NewTaskProvider>();
 
     final formattedDate = DateFormat(
@@ -17,43 +16,38 @@ class TaskDatePicker extends StatelessWidget {
     ).format(provider.dueDate);
 
     return ListTile(
-
       leading: const Icon(
         Icons.calendar_today,
         color: Color.fromARGB(255, 157, 164, 234),
       ),
-
       title: const Text(
         "Due Date",
-        style: TextStyle(
-          color: Color.fromARGB(255, 172, 172, 173),
-        ),
+        style: TextStyle(color: Color.fromARGB(255, 172, 172, 173)),
       ),
-
       subtitle: Text(formattedDate),
-
       onTap: () async {
+ 
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+
+  
+        final safeFirstDate = provider.dueDate.isBefore(today)
+            ? provider.dueDate
+            : today;
 
         final pickedDate = await showDatePicker(
           context: context,
-
           initialDate: provider.dueDate,
-
-          firstDate: DateTime.now(),
-
+          // 3. Apply the safe firstDate
+          firstDate: safeFirstDate,
           lastDate: DateTime(2100),
         );
 
         if (pickedDate != null) {
-
           provider.setDueDate(pickedDate);
         }
       },
-
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       tileColor: Colors.white,
     );
   }

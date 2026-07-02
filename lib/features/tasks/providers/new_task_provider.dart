@@ -1,6 +1,11 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/TaskModel.dart';
 import '../repositories/task_repository.dart';
+// Import your service locator and usecase
+import 'package:planova_app/core/di/service_locator.dart';
+import 'package:planova_app/features/group/domain/usecases/get_my_groups_usecase.dart';
+import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 
 enum NewTaskStatus { editing, submitting, success, error }
 
@@ -13,6 +18,7 @@ class NewTaskProvider extends ChangeNotifier {
   String description = '';
   String priority = 'medium';
   String? groupId;
+  String? groupName; 
   String taskType = 'Personal';
   DateTime dueDate = DateTime.now();
   bool reminderEnabled = false;
@@ -20,12 +26,25 @@ class NewTaskProvider extends ChangeNotifier {
   NewTaskStatus _status = NewTaskStatus.editing;
   String? _error;
 
+  List<GroupEntity> availableGroups = [];
+
   NewTaskProvider(this._repository);
 
   NewTaskStatus get status => _status;
   String? get error => _error;
   bool get isSubmitting => _status == NewTaskStatus.submitting;
   bool get isValid => title.trim().isNotEmpty;
+
+  Future<void> fetchGroups() async {
+    final getGroupsUseCase = getIt<GetMyGroupsUseCase>();
+    final result = await getGroupsUseCase.call();
+
+    result.fold(
+      (failure) => availableGroups = [],
+      (groups) => availableGroups = groups,
+    );
+    notifyListeners();
+  }
 
   void setTitle(String value) {
     title = value;
@@ -36,15 +55,22 @@ class NewTaskProvider extends ChangeNotifier {
     description = value;
     notifyListeners();
   }
-
+void initForSpecificGroup(String id, String name) {
+    clearTask(); // Clear previous data
+    groupId = id;
+    groupName = name;
+    taskType = 'Team';
+    notifyListeners();
+  }
   void setPriority(String value) {
     priority = value;
     notifyListeners();
   }
 
-  void setGroup(String? id, String type) {
+  void setGroup(String? id, String? name) {
     groupId = id;
-    taskType = type;
+    groupName = name;
+    taskType = id == null ? 'Personal' : 'Team';
     notifyListeners();
   }
 
@@ -83,6 +109,7 @@ class NewTaskProvider extends ChangeNotifier {
         description: description.trim(),
         priority: priority,
         groupId: groupId,
+        groupName: groupName,
         taskType: taskType,
         dueDate: dueDate,
         reminderEnabled: reminderEnabled,
@@ -105,6 +132,7 @@ class NewTaskProvider extends ChangeNotifier {
     description = task.description;
     priority = task.priority;
     groupId = task.groupId;
+    groupName = task.groupName;
     taskType = task.taskType;
     dueDate = task.dueDate;
     reminderEnabled = task.reminderEnabled;
@@ -135,6 +163,7 @@ class NewTaskProvider extends ChangeNotifier {
         description: description.trim(),
         priority: priority,
         groupId: groupId,
+        groupName: groupName,
         taskType: taskType,
         dueDate: dueDate,
         reminderEnabled: reminderEnabled,
@@ -158,6 +187,7 @@ class NewTaskProvider extends ChangeNotifier {
     description = '';
     priority = 'medium';
     groupId = null;
+    groupName = null;
     taskType = 'Personal';
     dueDate = DateTime.now();
     reminderEnabled = false;

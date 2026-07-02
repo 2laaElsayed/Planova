@@ -9,6 +9,7 @@ import '../widgets/tasks_list_widgets/section_header.dart';
 import '../widgets/tasks_list_widgets/task_card.dart';
 import 'task_screen.dart';
 import '../models/task_card_model.dart';
+import '../models/TaskModel.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -18,6 +19,54 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
+  void _showDeleteDialog(BuildContext context, TaskModel task, TasksProvider provider) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "Delete Task",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text("Are you sure you want to delete '${task.title}'?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext); 
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                provider.deleteTask(task.taskId);
+                
+                Navigator.pop(dialogContext);
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Task deleted successfully"),
+                    backgroundColor: Colors.redAccent,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: const Text(
+                "Delete",
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TasksProvider>(
@@ -94,49 +143,54 @@ class _TasksScreenState extends State<TasksScreen> {
                                       padding: const EdgeInsets.only(
                                         bottom: 12.0,
                                       ),
-                                      child: Stack(
-                                        children: [
-                                          TaskCard(
-                                            task: TaskCardModel.fromTaskModel(
-                                              task,
+                                      child: GestureDetector(
+                                        onLongPress: () {
+                                          _showDeleteDialog(context, task, provider);
+                                        },
+                                        child: Stack(
+                                          children: [
+                                            TaskCard(
+                                              task: TaskCardModel.fromTaskModel(
+                                                task,
+                                              ),
+                                              onToggle: () {
+                                                provider.toggleTask(task);
+                                              },
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        CreateTaskScreen(
+                                                          isEdit: true,
+                                                          task: task,
+                                                        ),
+                                                  ),
+                                                );
+                                              },
                                             ),
-                                            onToggle: () {
-                                              provider.toggleTask(task);
-                                            },
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      CreateTaskScreen(
-                                                        isEdit: true,
-                                                        task: task,
-                                                      ),
-                                                ),
-                                              );
-                                            },
-                                          ),
 
-                                          if (isOverdueSection)
-                                            Positioned(
-                                              left: 16,
-                                              top: 4,
-                                              bottom: 4,
-                                              child: Container(
-                                                width: 5,
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.redAccent,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(12),
-                                                        bottomLeft:
-                                                            Radius.circular(12),
-                                                      ),
+                                            if (isOverdueSection)
+                                              Positioned(
+                                                left: 16,
+                                                top: 4,
+                                                bottom: 4,
+                                                child: Container(
+                                                  width: 5,
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.redAccent,
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(12),
+                                                      bottomLeft:
+                                                          Radius.circular(12),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     );
                                   }),

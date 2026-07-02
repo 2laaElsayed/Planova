@@ -3,7 +3,12 @@ import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/core/constants/app_styles.dart';
 
 class PreviewCard extends StatelessWidget {
-  const PreviewCard({super.key, required this.color, this.subtitle, required this.name});
+  const PreviewCard({
+    super.key,
+    required this.color,
+    this.subtitle,
+    required this.name,
+  });
 
   final Color color;
   final String? subtitle;
@@ -29,10 +34,11 @@ class PreviewCard extends StatelessWidget {
                 color: color,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child:  Center(
+              child: Center(
                 child: Text(
-                  name[0],
-                  style: TextStyle(
+              
+                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -42,7 +48,8 @@ class PreviewCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              name,
+       
+              name.isNotEmpty ? name : 'New Group',
               style: AppStyles.styleSemiBold16.copyWith(
                 color: AppColors.kDarkBlue,
               ),

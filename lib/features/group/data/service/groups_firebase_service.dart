@@ -8,6 +8,7 @@ import 'package:planova_app/features/group/data/models/group_model.dart';
 import 'package:planova_app/features/group/data/models/group_task_model.dart';
 import 'package:planova_app/features/group/data/models/member_model.dart';
 import 'package:planova_app/features/group/data/models/user_search_model.dart';
+import 'package:planova_app/features/group/domain/entities/group_task_entity.dart';
 
 abstract class GroupsFirebaseService {
   Future<Either<Failure, void>> createGroup(GroupModel group);
@@ -41,6 +42,14 @@ abstract class GroupsFirebaseService {
     required String groupId,
   });
   Stream<List<GroupMessageModel>> getChatMessagesStream(String groupId);
+  Future<Either<Failure, void>> updateGroupTask({
+    required String groupId,
+    required String taskId,
+    required String title,
+    required String description,
+    required String priority,
+    required DateTime dueDate,
+  });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -115,12 +124,40 @@ class GroupsFirebaseServiceImpl implements GroupsFirebaseService {
   }
 
   @override
+  Future<Either<Failure, void>> updateGroupTask({
+    required String groupId,
+    required String taskId,
+    required String title,
+    required String description,
+    required String priority,
+    required DateTime dueDate,
+  }) async {
+    try {
+      await firestore
+          .collection('groups')
+          .doc(groupId)
+          .collection('tasks')
+          .doc(taskId)
+          .update({
+            'title': title,
+            'description': description,
+            'priority': priority,
+            'dueDate': Timestamp.fromDate(dueDate),
+          });
+      return right(null);
+    } catch (e) {
+      log(e.toString());
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
   Stream<List<GroupModel>> streamGroups() {
     final currentUid = _currentUid;
     return firestore
         .collection('groups')
         .where('member_uids', arrayContains: currentUid)
-        .snapshots() 
+        .snapshots()
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => GroupModel.fromJson(doc.data()))
@@ -265,30 +302,82 @@ class GroupsFirebaseServiceImpl implements GroupsFirebaseService {
     }
   }
 
+  TaskPriority _parsePriority(String? priorityStr) {
+    switch (priorityStr?.toLowerCase()) {
+      case 'high':
+        return TaskPriority.high;
+      case 'low':
+        return TaskPriority.low;
+      case 'medium':
+      default:
+        return TaskPriority.medium;
+    }
+  }
+
+  // 2. Update your stream mapping to use the helper
+  @override
+  Stream<List<GroupTaskModel>> streamGroupTasks(String groupId) {
+    return firestore
+        .collection('Tasks')
+        .where('groupId', isEqualTo: groupId)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            return GroupTaskModel(
+              id: data['task_id'] ?? doc.id,
+              groupId: data['groupId'] ?? '',
+              title: data['title'] ?? '',
+              description: data['description'] ?? '',
+
+              priority: _parsePriority(data['priority'] as String?),
+              dueDate: (data['due_date'] as Timestamp).toDate(),
+              isCompleted: data['status'] == 'done',
+              createdByUid: data['owner_uid'] ?? '',
+              createdAt: (data['created_at'] as Timestamp).toDate(),
+            );
+          }).toList();
+        });
+  }
+
   @override
   Future<Either<Failure, void>> createGroupTask(GroupTaskModel task) async {
     try {
-      final taskDocRef = firestore
-          .collection('groups')
-          .doc(task.groupId)
-          .collection('tasks')
-          .doc();
-      final finalTask = GroupTaskModel(
-        id: taskDocRef.id,
-        groupId: task.groupId,
-        title: task.title,
-        description: task.description,
-        priority: task.priority,
-        dueDate: task.dueDate,
-        isCompleted: task.isCompleted,
-        createdByUid: task.createdByUid,
-        createdAt: DateTime.now(),
-      );
+      final docRef = firestore.collection('Tasks').doc();
 
-      await taskDocRef.set(finalTask.toMap());
+      await docRef.set({
+        'task_id': docRef.id,
+        'title': task.title,
+        'description': task.description,
+        'priority': task.priority,
+        'groupId': task.groupId,
+
+        'task_type': 'Team',
+        'due_date': Timestamp.fromDate(task.dueDate),
+        'reminder_enabled': false,
+        'status': task.isCompleted ? 'done' : 'todo',
+        'owner_uid': task.createdByUid,
+        'created_at': Timestamp.fromDate(task.createdAt),
+      });
       return right(null);
     } catch (e) {
-      log(e.toString());
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> toggleTaskCompletion({
+    required String groupId,
+    required String taskId,
+    required bool isCompleted,
+  }) async {
+    try {
+      // 3. CHANGE THIS: Update in the root 'Tasks' collection
+      await firestore.collection('Tasks').doc(taskId).update({
+        'status': isCompleted ? 'done' : 'todo',
+      });
+      return right(null);
+    } catch (e) {
       return left(Failure(e.toString()));
     }
   }
@@ -310,41 +399,6 @@ class GroupsFirebaseServiceImpl implements GroupsFirebaseService {
           .toList();
 
       return right(tasks);
-    } catch (e) {
-      log(e.toString());
-      return left(Failure(e.toString()));
-    }
-  }
-
-  @override
-  Stream<List<GroupTaskModel>> streamGroupTasks(String groupId) {
-    return firestore
-        .collection('groups')
-        .doc(groupId)
-        .collection('tasks')
-        .orderBy('dueDate', descending: false)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => GroupTaskModel.fromMap(doc.data(), doc.id, groupId))
-              .toList(),
-        );
-  }
-
-  @override
-  Future<Either<Failure, void>> toggleTaskCompletion({
-    required String groupId,
-    required String taskId,
-    required bool isCompleted,
-  }) async {
-    try {
-      await firestore
-          .collection('groups')
-          .doc(groupId)
-          .collection('tasks')
-          .doc(taskId)
-          .update({'isCompleted': isCompleted});
-      return right(null);
     } catch (e) {
       log(e.toString());
       return left(Failure(e.toString()));

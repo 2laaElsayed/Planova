@@ -27,10 +27,14 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<NewTaskProvider>();
 
+      provider.fetchGroups();
+
       if (widget.isEdit && widget.task != null) {
         provider.loadTask(widget.task!);
       } else {
-        provider.clearTask();
+        if (provider.groupId == null) {
+          provider.clearTask();
+        }
       }
     });
   }
@@ -42,24 +46,27 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         return Scaffold(
           appBar: TaskAppBar(
             title: widget.isEdit ? "Task Details" : "New Task",
-       
           ),
           body: Padding(
             padding: const EdgeInsets.all(16),
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TaskInputFields(
                     initialTitle: provider.title,
                     initialDescription: provider.description,
                   ),
-
                   const SizedBox(height: 16),
+
                   const TaskOptionsRow(),
+                  
                   const SizedBox(height: 16),
                   const TaskDatePicker(),
+                  
                   const SizedBox(height: 16),
                   const TaskReminder(),
+                  
                   const SizedBox(height: 30),
 
                   PrimaryButton(

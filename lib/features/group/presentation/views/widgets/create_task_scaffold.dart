@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,9 +13,11 @@ import 'package:planova_app/features/group/presentation/views/widgets/group_drop
 import 'package:planova_app/features/group/presentation/views/widgets/priority_dropdown.dart';
 
 class CreateTaskScaffold extends StatefulWidget {
-  const CreateTaskScaffold({this.lockedGroupId, this.lockedGroupName});
+
+  const CreateTaskScaffold({super.key, this.lockedGroupId, this.lockedGroupName, this.taskToEdit});
   final String? lockedGroupId;
   final String? lockedGroupName;
+  final GroupTaskEntity? taskToEdit; 
 
   @override
   State<CreateTaskScaffold> createState() => _CreateTaskScaffoldState();
@@ -33,12 +34,21 @@ class _CreateTaskScaffoldState extends State<CreateTaskScaffold> {
   bool _reminderEnabled = false;
 
   bool get _isGroupLocked => widget.lockedGroupId != null;
+  bool get _isEditMode => widget.taskToEdit != null;
 
   @override
   void initState() {
     super.initState();
     _selectedGroupId = widget.lockedGroupId;
     _selectedGroupName = widget.lockedGroupName;
+
+  
+    if (_isEditMode) {
+      _titleController.text = widget.taskToEdit!.title;
+      _descriptionController.text = widget.taskToEdit!.description;
+      _priority = widget.taskToEdit!.priority;
+      _dueDate = widget.taskToEdit!.dueDate;
+    }
 
     if (!_isGroupLocked) {
       context.read<CreateTaskCubit>().loadAvailableGroups().then((_) {
@@ -88,15 +98,29 @@ class _CreateTaskScaffoldState extends State<CreateTaskScaffold> {
     }
 
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final cubit = context.read<CreateTaskCubit>();
 
-    context.read<CreateTaskCubit>().createTask(
-          groupId: _selectedGroupId!,
-          title: _titleController.text.trim(),
-          description: _descriptionController.text.trim(),
-          priority: _priority,
-          dueDate: _dueDate,
-          createdByUid: currentUid,
-        );
+    if (_isEditMode) {
+     
+      cubit.updateTask(
+        taskId: widget.taskToEdit!.id,
+        groupId: _selectedGroupId!,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        priority: _priority,
+        dueDate: _dueDate,
+      );
+    } else {
+   
+      cubit.createTask(
+        groupId: _selectedGroupId!,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        priority: _priority,
+        dueDate: _dueDate,
+        createdByUid: currentUid,
+      );
+    }
   }
 
   @override
@@ -111,7 +135,8 @@ class _CreateTaskScaffoldState extends State<CreateTaskScaffold> {
           onPressed: () => Navigator.of(context).pop(),
           icon: Icon(Icons.arrow_back_ios, color: AppColors.mediumGrey),
         ),
-        title: Text("New Task", style: AppStyles.styleSemiBold18),
+    
+        title: Text(_isEditMode ? "Update Task" : "New Task", style: AppStyles.styleSemiBold18),
       ),
       body: BlocListener<CreateTaskCubit, CreateTaskState>(
         listener: (context, state) {
@@ -275,7 +300,10 @@ class _CreateTaskScaffoldState extends State<CreateTaskScaffold> {
                     final isLoading = state is CreateTaskLoading;
                     return CustomButton(
                       onTap: isLoading ? null : () => _submit(context),
-                      title: isLoading ? "Creating..." : "Create Task",
+                      // 4. Dynamic Button Title
+                      title: isLoading 
+                          ? (_isEditMode ? "Updating..." : "Creating...") 
+                          : (_isEditMode ? "Update Task" : "Create Task"),
                     );
                   },
                 ),
@@ -288,4 +316,3 @@ class _CreateTaskScaffoldState extends State<CreateTaskScaffold> {
     );
   }
 }
-

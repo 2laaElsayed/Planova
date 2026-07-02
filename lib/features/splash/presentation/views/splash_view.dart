@@ -26,7 +26,7 @@ class _SplashViewState extends State<SplashView>
     super.initState();
     _initAnimations();
     _startAnimation();
-    _navigateToNextScreen();
+
   }
 
   void _initAnimations() {
@@ -34,6 +34,12 @@ class _SplashViewState extends State<SplashView>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     );
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _navigateToNextScreen();
+      }
+    });
 
     _iconScale = Tween<double>(begin: 1.0, end: 0.4).animate(
       CurvedAnimation(
@@ -73,9 +79,10 @@ class _SplashViewState extends State<SplashView>
   }
 
   void _navigateToNextScreen() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
+    if (!mounted) return;
 
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = context.read<AuthProvider>();
 
       if (authProvider.isLoggedIn && authProvider.isEmailVerified) {
@@ -111,7 +118,6 @@ class _SplashViewState extends State<SplashView>
                 ),
               ),
             ),
-
             FadeTransition(
               opacity: _iconOpacity,
               child: ScaleTransition(

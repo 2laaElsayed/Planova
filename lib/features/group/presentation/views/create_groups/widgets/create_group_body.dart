@@ -52,6 +52,8 @@ class _CreateGroupBodyState extends State<CreateGroupBody> {
   @override
   Widget build(BuildContext context) {
     final cubit = BlocProvider.of<CreateGroupCubit>(context);
+    final isTeam = widget.groupType == ScopeTab.team;
+
     return BlocListener<CreateGroupCubit, CreateGroupState>(
       listener: (context, state) {
         if (state is CreateGroupSuccess) {
@@ -71,48 +73,17 @@ class _CreateGroupBodyState extends State<CreateGroupBody> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            StepperWidget(currentStep: currentStep),
-            const SizedBox(height: 40),
+            if (isTeam) ...[
+              StepperWidget(currentStep: currentStep),
+              const SizedBox(height: 40),
+            ] else ...[
+              const SizedBox(height: 10),
+            ],
+
             Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    currentStep = index;
-                  });
-                },
-                children: [
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: DetailsBody(
-                      onNameChanged: (data) {
-                        cubit.groupName = data;
-                      },
-                      onDesChanged: (data) {
-                        cubit.groupDescription = data;
-                      },
-                    ),
-                  ),
-                  AppearanceBody(
-                    colors: colors,
-                    selectedColor: selectedColor,
-                    onColorSelected: (color) {
-                      setState(() {
-                        selectedColor = color;
-                        cubit.updateColor(
-                          '#${color.value.toRadixString(16).substring(2)}',
-                        );
-                      });
-                    },
-                    name: cubit.groupName,
-                  ),
-                  MembersBody(
-                    selectedColor: selectedColor,
-                    name: cubit.groupName,
-                  ),
-                ],
-              ),
+              child: isTeam ? _buildTeamFlow(cubit) : _buildPersonalFlow(cubit),
             ),
+
             BlocBuilder<CreateGroupCubit, CreateGroupState>(
               builder: (context, state) {
                 final isLoading = state is CreateGroupLoading;
@@ -121,33 +92,119 @@ class _CreateGroupBodyState extends State<CreateGroupBody> {
                   onTap: isLoading
                       ? null
                       : () {
-                          if (currentStep == 2) {
-                            cubit.createGroup(widget.groupType);
+                          if (isTeam) {
+                            if (currentStep == 2) {
+                              cubit.createGroup(widget.groupType);
+                            } else {
+                              if (cubit.groupName.isNotEmpty &&
+                                  cubit.groupDescription.isNotEmpty) {
+                                nextStep();
+                              } else {
+                                _showErrorSnackBar(context);
+                              }
+                            }
                           } else {
                             if (cubit.groupName.isNotEmpty &&
                                 cubit.groupDescription.isNotEmpty) {
-                              nextStep();
+                              cubit.createGroup(widget.groupType);
                             } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  backgroundColor: AppColors.logoutRed,
-                                  content: const Text(
-                                    "All fields are required",
-                                  ),
-                                ),
-                              );
+                              _showErrorSnackBar(context);
                             }
                           }
                         },
-                  title: currentStep == 2
-                      ? (isLoading ? "Creating..." : "Create Group")
-                      : "Continue",
+                  title: isTeam
+                      ? (currentStep == 2
+                            ? (isLoading ? "Creating..." : "Create Group")
+                            : "Continue")
+                      : (isLoading ? "Saving..." : "Save"),
                 );
               },
             ),
             const SizedBox(height: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTeamFlow(CreateGroupCubit cubit) {
+    return PageView(
+      controller: _pageController,
+      onPageChanged: (index) {
+        setState(() {
+          currentStep = index;
+        });
+      },
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: DetailsBody(
+            onNameChanged: (data) {
+              setState(() {
+                cubit.groupName = data;
+              });
+            },
+            onDesChanged: (data) {
+              cubit.groupDescription = data;
+            },
+          ),
+        ),
+        AppearanceBody(
+          colors: colors,
+          selectedColor: selectedColor,
+          onColorSelected: (color) {
+            setState(() {
+              selectedColor = color;
+              cubit.updateColor(
+                '#${color.value.toRadixString(16).substring(2)}',
+              );
+            });
+          },
+          name: cubit.groupName,
+        ),
+        MembersBody(selectedColor: selectedColor, name: cubit.groupName),
+      ],
+    );
+  }
+
+  Widget _buildPersonalFlow(CreateGroupCubit cubit) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          AppearanceBody(
+            colors: colors,
+            selectedColor: selectedColor,
+            onColorSelected: (color) {
+              setState(() {
+                selectedColor = color;
+                cubit.updateColor(
+                  '#${color.value.toRadixString(16).substring(2)}',
+                );
+              });
+            },
+            name: cubit.groupName,
+          ),
+          const SizedBox(height: 24),
+          DetailsBody(
+            onNameChanged: (data) {
+              setState(() {
+                cubit.groupName = data;
+              });
+            },
+            onDesChanged: (data) {
+              cubit.groupDescription = data;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: AppColors.logoutRed,
+        content: Text("All fields are required"),
       ),
     );
   }

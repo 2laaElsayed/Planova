@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 import 'package:planova_app/features/group/domain/entities/group_task_entity.dart';
+import 'package:planova_app/features/group/domain/repos/groups_repo.dart';
 import 'package:planova_app/features/group/domain/usecases/create_group_task_usecase.dart';
 import 'package:planova_app/features/group/domain/usecases/get_my_groups_usecase.dart';
 
@@ -11,8 +12,9 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
   CreateTaskCubit({
     required this.createGroupTaskUseCase,
     required this.getMyGroupsUseCase,
+    required this.groupsRepo,
   }) : super(CreateTaskInitial());
-
+  final GroupsRepo groupsRepo;
   final CreateGroupTaskUseCase createGroupTaskUseCase;
   final GetMyGroupsUseCase getMyGroupsUseCase;
 
@@ -23,6 +25,32 @@ class CreateTaskCubit extends Cubit<CreateTaskState> {
     result.fold(
       (failure) => availableGroups = const [],
       (groups) => availableGroups = groups,
+    );
+  }
+
+  Future<void> updateTask({
+    required String taskId,
+    required String groupId,
+    required String title,
+    required String description,
+    required TaskPriority priority,
+    required DateTime dueDate,
+  }) async {
+    emit(CreateTaskLoading());
+
+    // 3. Now groupsRepo is defined and recognized
+    final result = await groupsRepo.updateGroupTask(
+      taskId: taskId,
+      groupId: groupId,
+      title: title,
+      description: description,
+      priority: priority.name,
+      dueDate: dueDate,
+    );
+
+    result.fold(
+      (failure) => emit(CreateTaskFailure(errMessage: failure.message)),
+      (_) => emit(CreateTaskSuccess()),
     );
   }
 

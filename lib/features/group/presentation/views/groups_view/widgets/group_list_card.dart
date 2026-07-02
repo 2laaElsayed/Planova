@@ -9,6 +9,8 @@ import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/avatar_square.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/members_stack.dart';
 import 'package:planova_app/features/group/presentation/views/groups_view/widgets/scope_badge.dart';
+import 'package:planova_app/core/di/service_locator.dart';
+import 'package:planova_app/features/group/domain/repos/groups_repo.dart';
 
 class GroupListCard extends StatelessWidget {
   const GroupListCard({super.key, required this.group});
@@ -16,7 +18,6 @@ class GroupListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final percent = 0;
     return GestureDetector(
       onTap: () =>
           GoRouter.of(context).push(AppRouter.kGroupDetailsView, extra: group),
@@ -78,33 +79,70 @@ class GroupListCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                const Text(
-                  'Progress',
-                  style: TextStyle(fontSize: 12, color: Colors.black45),
-                ),
-                const Spacer(),
-                Text(
-                  '$percent%',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black45,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+
+            StreamBuilder(
+              stream: getIt<GroupsRepo>().streamGroupTasks(group.groupId),
+              builder: (context, snapshot) {
+                double currentProgress = 0.0;
+
+                if (snapshot.hasData) {
+                  snapshot.data!.fold((failure) => currentProgress = 0.0, (
+                    tasks,
+                  ) {
+                    if (tasks.isNotEmpty) {
+                      int completedTasks = tasks
+                          .where((t) => t.isCompleted)
+                          .length;
+                      currentProgress = completedTasks / tasks.length;
+                    }
+                  });
+                }
+
+                final int percent = (currentProgress * 100).toInt();
+
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'Progress',
+                          style: TextStyle(fontSize: 12, color: Colors.black45),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '$percent%',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black45,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0.0, end: currentProgress),
+                        duration: const Duration(milliseconds: 800),
+                        builder: (context, value, _) {
+                          return LinearProgressIndicator(
+                            value: value.clamp(0.0, 1.0),
+                            minHeight: 5,
+                            backgroundColor: const Color(0xFFEDF0F6),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              group.accentColor,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 6),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: 0,
-                minHeight: 5,
-                backgroundColor: const Color(0xFFEDF0F6),
-                valueColor: AlwaysStoppedAnimation<Color>(group.accentColor),
-              ),
-            ),
+
+  
             const SizedBox(height: 8),
             Row(
               children: [
@@ -113,15 +151,15 @@ class GroupListCard extends StatelessWidget {
                   extra: group.memberUids.length,
                 ),
                 const SizedBox(width: 10),
-                Icon(
+                const Icon(
                   Icons.chat_bubble_outline_rounded,
                   size: 15,
                   color: Colors.black38,
                 ),
                 const SizedBox(width: 3),
-                Text(
-                  '0',
-                  style: const TextStyle(fontSize: 12, color: Colors.black45),
+                const Text(
+                  '0', 
+                  style: TextStyle(fontSize: 12, color: Colors.black45),
                 ),
                 const Spacer(),
                 ScopeBadge(scope: group.type),

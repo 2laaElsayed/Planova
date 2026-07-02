@@ -11,8 +11,14 @@ class GetGroupsCubit extends Cubit<GetGroupsState> {
   final GetMyGroupsUseCase getMyGroupsUseCase;
 
   Future<void> getGroups() async {
+    if (isClosed) return;
+
     emit(GetGroupsLoading());
+
     final returnedData = await getMyGroupsUseCase.call();
+
+    if (isClosed) return;
+
     returnedData.fold(
       (failure) => emit(GetGroupsFailure(errMessage: failure.message)),
       (data) => emit(GetGroupsSuccess(groups: data)),

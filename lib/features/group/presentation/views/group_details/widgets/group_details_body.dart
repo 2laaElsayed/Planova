@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:planova_app/core/di/service_locator.dart';
+import 'package:planova_app/features/group/data/models/group_model.dart';
 import 'package:planova_app/features/group/domain/entities/group_entity.dart';
 import 'package:planova_app/features/group/presentation/manager/group_details_cubit/group_details_cubit.dart';
 import 'package:planova_app/features/group/presentation/manager/group_member_cubit/group_members_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:planova_app/features/group/presentation/views/group_details/widg
 import 'package:planova_app/features/group/presentation/views/group_details/widgets/members_tab.dart';
 import 'package:planova_app/features/group/presentation/views/group_details/widgets/overall_progress_card.dart';
 import 'package:planova_app/features/group/presentation/views/group_details/widgets/tasks_tab.dart';
+import 'package:planova_app/features/group/data/models/group_item.dart';
 
 class GroupDetailsBody extends StatefulWidget {
   const GroupDetailsBody({super.key, required this.groupEntity});
@@ -21,15 +23,20 @@ class GroupDetailsBody extends StatefulWidget {
 
 class _GroupDetailsBodyState extends State<GroupDetailsBody> {
   late final GroupDetailsCubit _groupDetailsCubit;
+  late final bool isTeam;
 
   @override
   void initState() {
     super.initState();
+    isTeam = widget.groupEntity.type == ScopeTab.team;
+
     _groupDetailsCubit = getIt<GroupDetailsCubit>(
       param1: widget.groupEntity.groupId,
-    )
-      ..watchTasks()
-      ..watchChat();
+    )..watchTasks();
+
+    if (isTeam) {
+      _groupDetailsCubit.watchChat();
+    }
   }
 
   @override
@@ -44,8 +51,14 @@ class _GroupDetailsBodyState extends State<GroupDetailsBody> {
       providers: [
         BlocProvider.value(value: _groupDetailsCubit),
         BlocProvider(
-          create: (context) =>
-              getIt<GroupMembersCubit>()..fetchMembers(widget.groupEntity.groupId),
+          create: (context) {
+            final cubit = getIt<GroupMembersCubit>();
+
+            if (isTeam) {
+              cubit.fetchMembers(widget.groupEntity.groupId);
+            }
+            return cubit;
+          },
         ),
       ],
       child: Padding(
@@ -54,19 +67,24 @@ class _GroupDetailsBodyState extends State<GroupDetailsBody> {
           children: [
             GroupTopInfo(groupEntity: widget.groupEntity),
             const SizedBox(height: 12),
-            const OverallProgressCard(),
+            OverallProgressCard(groupColor: widget.groupEntity.accentColor),
             const SizedBox(height: 12),
-            const GroupTabsBar(),
-            const SizedBox(height: 12),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  TasksTab(groupEntity: widget.groupEntity),
-                  MembersTab(groupEntity: widget.groupEntity),
-                  ChatTab(groupId: widget.groupEntity.groupId),
-                ],
+
+            if (isTeam) ...[
+              const GroupTabsBar(),
+              const SizedBox(height: 12),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    TasksTab(groupEntity: widget.groupEntity),
+                    MembersTab(groupEntity: widget.groupEntity),
+                    ChatTab(groupId: widget.groupEntity.groupId),
+                  ],
+                ),
               ),
-            ),
+            ] else ...[
+              Expanded(child: TasksTab(groupEntity: widget.groupEntity)),
+            ],
           ],
         ),
       ),

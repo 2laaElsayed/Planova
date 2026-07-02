@@ -25,6 +25,26 @@ class GroupsRepoImpl implements GroupsRepo {
   }
 
   @override
+  Future<Either<Failure, void>> updateGroupTask({
+    required String groupId,
+    required String taskId,
+    required String title,
+    required String description,
+    required String priority,
+    required DateTime dueDate,
+  }) async {
+    // This now correctly calls the firebaseService
+    return await firebaseService.updateGroupTask(
+      groupId: groupId,
+      taskId: taskId,
+      title: title,
+      description: description,
+      priority: priority,
+      dueDate: dueDate,
+    );
+  }
+
+  @override
   Future<Either<Failure, List<GroupEntity>>> getGroups() async {
     final returnedData = await firebaseService.getGroups();
     return returnedData.fold(
@@ -32,7 +52,8 @@ class GroupsRepoImpl implements GroupsRepo {
       (data) => right(data.map((e) => e.toEntity()).toList()),
     );
   }
-@override
+
+  @override
   Stream<Either<Failure, List<GroupEntity>>> streamGroups() {
     return firebaseService.streamGroups().transform(
       StreamTransformer.fromHandlers(
@@ -45,6 +66,7 @@ class GroupsRepoImpl implements GroupsRepo {
       ),
     );
   }
+
   @override
   Future<Either<Failure, UserSearchEntity>> searchUserByEmail(
     String email,
@@ -113,16 +135,18 @@ class GroupsRepoImpl implements GroupsRepo {
   Stream<Either<Failure, List<GroupTaskEntity>>> streamGroupTasks(
     String groupId,
   ) {
-    return firebaseService.streamGroupTasks(groupId).transform(
-      StreamTransformer.fromHandlers(
-        handleData: (models, sink) {
-          sink.add(right(models.map((e) => e as GroupTaskEntity).toList()));
-        },
-        handleError: (error, stackTrace, sink) {
-          sink.add(left(Failure(error.toString())));
-        },
-      ),
-    );
+    return firebaseService
+        .streamGroupTasks(groupId)
+        .transform(
+          StreamTransformer.fromHandlers(
+            handleData: (models, sink) {
+              sink.add(right(models.map((e) => e as GroupTaskEntity).toList()));
+            },
+            handleError: (error, stackTrace, sink) {
+              sink.add(left(Failure(error.toString())));
+            },
+          ),
+        );
   }
 
   @override
@@ -157,15 +181,19 @@ class GroupsRepoImpl implements GroupsRepo {
   Stream<Either<Failure, List<GroupMessageEntity>>> getChatMessagesStream(
     String groupId,
   ) {
-    return firebaseService.getChatMessagesStream(groupId).transform(
-      StreamTransformer.fromHandlers(
-        handleData: (models, sink) {
-          sink.add(right(models.map((e) => e as GroupMessageEntity).toList()));
-        },
-        handleError: (error, stackTrace, sink) {
-          sink.add(left(Failure(error.toString())));
-        },
-      ),
-    );
+    return firebaseService
+        .getChatMessagesStream(groupId)
+        .transform(
+          StreamTransformer.fromHandlers(
+            handleData: (models, sink) {
+              sink.add(
+                right(models.map((e) => e as GroupMessageEntity).toList()),
+              );
+            },
+            handleError: (error, stackTrace, sink) {
+              sink.add(left(Failure(error.toString())));
+            },
+          ),
+        );
   }
 }

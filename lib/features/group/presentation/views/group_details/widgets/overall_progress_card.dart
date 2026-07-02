@@ -4,8 +4,8 @@ import 'package:planova_app/core/constants/app_colors.dart';
 import 'package:planova_app/features/group/presentation/manager/group_details_cubit/group_details_cubit.dart';
 
 class OverallProgressCard extends StatelessWidget {
-  const OverallProgressCard({super.key});
-
+  const OverallProgressCard({super.key, required this.groupColor});
+  final Color groupColor;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
@@ -52,15 +52,20 @@ class OverallProgressCard extends StatelessWidget {
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 6,
-                  backgroundColor: const Color(0xFFEDF0F7),
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                    AppColors.kLightBlue,
-                  ),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: progress),
+                  duration: const Duration(milliseconds: 500),
+                  builder: (context, value, child) {
+                    return LinearProgressIndicator(
+                      value: value,
+                      minHeight: 6,
+                      backgroundColor: const Color(0xFFEDF0F7),
+                      valueColor: AlwaysStoppedAnimation<Color>(groupColor),
+                    );
+                  },
                 ),
               ),
+
               const SizedBox(height: 8),
               Row(
                 children: [
